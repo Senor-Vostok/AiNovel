@@ -12,7 +12,7 @@ class Textures:
         self.resizer = GetSystemMetrics(0) / 1920
         self.priority = ["UI", "Objects", "Background"]
         self.font = pygame.font.Font('19363.ttf', int(20 * self.resizer))
-        self.characters = {f"character{i + 1}": [self.render(f"Assets/Characters/character{i + 1}.png", (812, 256))] for i in range(18)}
+        self.characters = {f"character{i + 1}": [self.render(f"Assets/Characters/character{i + 1}.png", (512, 512))] for i in range(27)}
 
     def post_render(self, texture, size):
         return pygame.transform.scale(texture, size).convert_alpha()
