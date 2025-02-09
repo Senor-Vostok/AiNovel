@@ -1,3 +1,5 @@
+import math
+
 import pygame
 from datetime import datetime
 import Engine.Constants
@@ -279,3 +281,31 @@ class Figure(pygame.sprite.Sprite):
 
     def draw(self, screen):
         screen.blit(self.surface, (self.xoy[0] - self.local_center[0], self.xoy[1] - self.local_center[1]))
+
+
+class Circle(pygame.sprite.Sprite):
+    def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), radius=1, thickness=0):
+        pygame.sprite.Sprite.__init__(self)
+        self.xoy = xoy
+        self.color = color
+        self.color_bord = color_bord
+        self.radius = radius
+        self.thickness = thickness
+        self.surface = None
+        self.create_surface()
+
+    def create_surface(self):
+        self.surface = pygame.Surface((2*(self.radius + self.thickness), 2*(self.radius + self.thickness)),
+                                      pygame.SRCALPHA)
+        self.surface.fill((0, 0, 0, 0))
+        self.fill_surface()
+
+    def fill_surface(self):
+        center = (self.radius + self.thickness, self.radius + self.thickness)
+        pygame.draw.circle(self.surface, self.color, center, self.radius)
+        pygame.draw.circle(self.surface, self.color_bord, center, self.radius, self.thickness)
+
+    def draw(self, screen):
+        screen.blit(self.surface, (self.xoy[0] - self.radius - self.thickness,
+                                   self.xoy[1] - self.radius - self.thickness))
+
