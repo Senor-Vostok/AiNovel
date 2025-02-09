@@ -238,20 +238,6 @@ class Image(pygame.sprite.Sprite):
         pass
 
 
-pygame.init()
-
-# Создаём окно
-screen = pygame.display.set_mode((GetSystemMetrics(0), GetSystemMetrics(1)),
-                                 pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.RESIZABLE)
-
-# Загружаем шрифт
-font = pygame.font.Font(None, 36)
-
-# Рендерим текст
-text = font.render("Наведи на меня", True, (255, 255, 255))
-text_rect = text.get_rect(center=(200, 200))
-
-
 class Figure(pygame.sprite.Sprite):
     def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=0):
         pygame.sprite.Sprite.__init__(self)
@@ -295,7 +281,7 @@ class Circle(pygame.sprite.Sprite):
         self.create_surface()
 
     def create_surface(self):
-        self.surface = pygame.Surface((2*(self.radius + self.thickness), 2*(self.radius + self.thickness)),
+        self.surface = pygame.Surface((2 * (self.radius + self.thickness), 2 * (self.radius + self.thickness)),
                                       pygame.SRCALPHA)
         self.surface.fill((0, 0, 0, 0))
         self.fill_surface()
@@ -308,4 +294,3 @@ class Circle(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.surface, (self.xoy[0] - self.radius - self.thickness,
                                    self.xoy[1] - self.radius - self.thickness))
-
