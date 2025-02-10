@@ -1,4 +1,5 @@
 import pygame
+import os
 from win32api import GetSystemMetrics
 
 
@@ -12,7 +13,8 @@ class Textures:
         self.resizer = GetSystemMetrics(0) / 1920
         self.priority = ["UI", "Objects", "Background"]
         self.font = pygame.font.Font('19363.ttf', int(20 * self.resizer))
-        self.characters = {f"character{i + 1}": [self.render(f"Assets/Characters/character{i + 1}.png", (512, 512))] for i in range(27)}
+        self.characters = {name[:-4]: [self.render(f"Assets/Characters/{name}", (512, 512))] for name in os.listdir("Assets/Characters")}
+        self.locations = {name[:-4]: [self.render(f"Assets/Locations/{name}", (1920, 1080))] for name in os.listdir("Assets/Locations")}
 
     def post_render(self, texture, size):
         return pygame.transform.scale(texture, size).convert_alpha()
