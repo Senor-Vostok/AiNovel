@@ -1,13 +1,18 @@
+import math
+
 import pygame
 from datetime import datetime
 import Engine.Constants
 from Engine.Constants import DEFAULT_COLOR
 from Engine.Sound.Sounds import Sounds
+from win32api import GetSystemMetrics
+
 sounds = Sounds()
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, image, xoy, active=True, text=None, colors=(Engine.Constants.TEXT_ENABLE, Engine.Constants.TEXT_DISABLE)):
+    def __init__(self, image, xoy, active=True, text=None,
+                 colors=(Engine.Constants.TEXT_ENABLE, Engine.Constants.TEXT_DISABLE)):
         pygame.sprite.Sprite.__init__(self)
         self.xoy = xoy
         self.colors = colors
@@ -42,7 +47,7 @@ class Button(pygame.sprite.Sprite):
             if mouse_click[2] and mouse_click[3] == 1 and self.func:
                 if self.one_press:
                     self.one_press = False
-                    #pygame.mixer.Channel(1).play(sounds.click)
+                    # pygame.mixer.Channel(1).play(sounds.click)
                     self.func(*self.args)
             else:
                 self.one_press = True
@@ -76,7 +81,7 @@ class Switch(pygame.sprite.Sprite):
         if self.rect.colliderect(mouse_click[0], mouse_click[1], 1, 1) and mouse_click[2] and mouse_click[3] == 1:
             if self.one_press:
                 return
-            #pygame.mixer.Channel(1).play(sounds.click)
+            # pygame.mixer.Channel(1).play(sounds.click)
             self.one_press = True
             self.active = not self.active
             self.image = self.enable if self.active else self.disable
@@ -97,7 +102,8 @@ class Slicer(pygame.sprite.Sprite):
     def draw(self, screen):
         delta_x = ((self.rect[2] - self.point_image.get_rect()[2]) / self.cuts) * self.now_sector
         screen.blit(self.back_image, self.rect)
-        screen.blit(self.point_image, (self.rect.x + delta_x, self.rect.y - (self.point_image.get_rect()[3] // 2 - self.rect[3] // 2)))
+        screen.blit(self.point_image,
+                    (self.rect.x + delta_x, self.rect.y - (self.point_image.get_rect()[3] // 2 - self.rect[3] // 2)))
 
     def connect(self, func, *args):
         self.func = func
@@ -133,7 +139,8 @@ class InteractLabel(pygame.sprite.Sprite):
         image = self.font.render(self.text, False, DEFAULT_COLOR if self.can_write else Engine.Constants.TEXT_DISABLE)
         i = 1
         while image.get_rect()[2] < self.rect[2] - 50 and i <= len(self.text):
-            image = self.font.render(self.text[-i:], False,  DEFAULT_COLOR if self.can_write else Engine.Constants.TEXT_DISABLE)
+            image = self.font.render(self.text[-i:], False,
+                                     DEFAULT_COLOR if self.can_write else Engine.Constants.TEXT_DISABLE)
             i += 1
         if not self.center:
             screen.blit(image, (self.rect[0] + 10, self.rect[1] + 6))
@@ -231,3 +238,59 @@ class Image(pygame.sprite.Sprite):
         pass
 
 
+class Figure(pygame.sprite.Sprite):
+    def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=0):
+        pygame.sprite.Sprite.__init__(self)
+        self.local_form = form
+        self.global_form = list(list())
+        self.local_center = []
+        self.xoy = xoy
+        self.color = color
+        self.color_bord = color_bord
+        self.thickness = thickness
+        self.surface = None
+        self.create_surface()
+
+    def create_surface(self):
+        delta_x, delta_y = (max([_[0] for _ in self.local_form]) - min([_[0] for _ in self.local_form]),
+                            max([_[1] for _ in self.local_form]) - min([_[1] for _ in self.local_form]))
+        self.local_center = ((delta_x + self.thickness * 2) / 2, (delta_y + self.thickness * 2) / 2)
+        self.surface = pygame.Surface((delta_x + self.thickness * 2, delta_y + self.thickness * 2), pygame.SRCALPHA)
+        self.surface.fill((0, 0, 0, 0))
+        self.fill_surface()
+
+    def fill_surface(self):
+        zero_x, zero_y = min([_[0] for _ in self.local_form]), min([_[1] for _ in self.local_form])
+        form = [(i[0] - zero_x + self.thickness, i[1] - zero_y + self.thickness) for i in self.local_form]
+        pygame.draw.polygon(self.surface, self.color, form)
+        pygame.draw.polygon(self.surface, self.color_bord, form, self.thickness)
+
+    def draw(self, screen):
+        screen.blit(self.surface, (self.xoy[0] - self.local_center[0], self.xoy[1] - self.local_center[1]))
+
+
+class Circle(pygame.sprite.Sprite):
+    def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), radius=1, thickness=0):
+        pygame.sprite.Sprite.__init__(self)
+        self.xoy = xoy
+        self.color = color
+        self.color_bord = color_bord
+        self.radius = radius
+        self.thickness = thickness
+        self.surface = None
+        self.create_surface()
+
+    def create_surface(self):
+        self.surface = pygame.Surface((2 * (self.radius + self.thickness), 2 * (self.radius + self.thickness)),
+                                      pygame.SRCALPHA)
+        self.surface.fill((0, 0, 0, 0))
+        self.fill_surface()
+
+    def fill_surface(self):
+        center = (self.radius + self.thickness, self.radius + self.thickness)
+        pygame.draw.circle(self.surface, self.color, center, self.radius)
+        pygame.draw.circle(self.surface, self.color_bord, center, self.radius, self.thickness)
+
+    def draw(self, screen):
+        screen.blit(self.surface, (self.xoy[0] - self.radius - self.thickness,
+                                   self.xoy[1] - self.radius - self.thickness))
