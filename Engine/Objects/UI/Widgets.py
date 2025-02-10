@@ -11,8 +11,7 @@ sounds = Sounds()
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, image, xoy, active=True, text=None,
-                 colors=(Engine.Constants.TEXT_ENABLE, Engine.Constants.TEXT_DISABLE)):
+    def __init__(self, image, xoy, active=True, text=None, colors=(Engine.Constants.TEXT_ENABLE, Engine.Constants.TEXT_DISABLE)):
         pygame.sprite.Sprite.__init__(self)
         self.xoy = xoy
         self.colors = colors
@@ -238,6 +237,43 @@ class Image(pygame.sprite.Sprite):
         pass
 
 
+class DropDown(pygame.sprite.Sprite):
+    def __init__(self, images, xoy, texts):
+        pygame.sprite.Sprite.__init__(self)
+        self.center = images[3].get_rect(center=xoy)
+        self.is_open = False
+        self.selected_text = InteractLabel([images[0], images[0]], (self.center.x - images[1].get_rect()[2] / 2, self.center.y), False)
+        self.selected_text.text = texts[0]
+        self.arrow_button = Button(images[1:3], (self.center.x + images[0].get_rect()[2] / 2, self.center.y))
+        self.variants = list()
+        for i, text in enumerate(texts):
+            self.variants.append(Button(images[3:], (self.center[0], self.center[1] + (i + 1) * images[3].get_rect()[3]), text=text))
+            self.variants[-1].connect(self.select_variant, text)
+        self.arrow_button.connect(self.open_close)
+
+    def select_variant(self, text):
+        self.selected_text.text = text
+
+    def open_close(self):
+        self.is_open = not self.is_open
+
+    def draw(self, screen):
+        self.selected_text.draw(screen)
+        self.arrow_button.draw(screen)
+        if not self.is_open:
+            return
+        for obj in self.variants:
+            obj.draw(screen)
+
+    def update(self, mouse_click, command):
+        self.selected_text.update(mouse_click, command)
+        self.arrow_button.update(mouse_click, command)
+        if not self.is_open:
+            return
+        for obj in self.variants:
+            obj.update(mouse_click, command)
+
+
 class Figure(pygame.sprite.Sprite):
     def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=0):
         pygame.sprite.Sprite.__init__(self)
@@ -268,6 +304,9 @@ class Figure(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.surface, (self.xoy[0] - self.local_center[0], self.xoy[1] - self.local_center[1]))
 
+    def update(self, mouse_click, command):
+        pass
+
 
 class Circle(pygame.sprite.Sprite):
     def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), radius=1, thickness=0):
@@ -292,5 +331,7 @@ class Circle(pygame.sprite.Sprite):
         pygame.draw.circle(self.surface, self.color_bord, center, self.radius, self.thickness)
 
     def draw(self, screen):
-        screen.blit(self.surface, (self.xoy[0] - self.radius - self.thickness,
-                                   self.xoy[1] - self.radius - self.thickness))
+        screen.blit(self.surface, (self.xoy[0] - self.radius - self.thickness, self.xoy[1] - self.radius - self.thickness))
+
+    def update(self, mouse_click, command):
+        pass

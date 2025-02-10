@@ -15,6 +15,11 @@ class Textures:
         self.font = pygame.font.Font('19363.ttf', int(20 * self.resizer))
         self.characters = {name[:-4]: [self.render(f"Assets/Characters/{name}", (512, 512))] for name in os.listdir("Assets/Characters")}
         self.locations = {name[:-4]: [self.render(f"Assets/Locations/{name}", (1920, 1080))] for name in os.listdir("Assets/Locations")}
+        self.DropDown = {"selected": [self.render("Assets/UI/DropDown/selected.png", (342, 48))],
+                         "arrow": [self.render("Assets/UI/DropDown/arrow.png", (48, 48)),
+                                   self.render("Assets/UI/DropDown/arrowt.png", (48, 48))],
+                         "variant": [self.render("Assets/UI/DropDown/variant.png", (390, 48)),
+                                     self.render("Assets/UI/DropDown/variantt.png", (390, 48))]}
 
     def post_render(self, texture, size):
         return pygame.transform.scale(texture, size).convert_alpha()

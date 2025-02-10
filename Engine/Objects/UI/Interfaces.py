@@ -11,4 +11,5 @@ class Test:  # Специально для Богданчика пример с 
                              color_bord=(252, 0, 0, 255))
         self.circle = Circle([xoy[0], xoy[1] + 200], (48, 35, 22, 255), radius=100, thickness=2,
                              color_bord=(252, 0, 0, 0))
-        self.surface = Surface(self.image, self.hello, self.figure)
+        self.dropdown = DropDown(textures.DropDown["selected"] + textures.DropDown["arrow"] + textures.DropDown["variant"], xoy, ("1", "2", "3", "4", "5"))
+        self.surface = Surface(self.image, self.hello, self.figure, self.dropdown)
