@@ -8,7 +8,6 @@ class Effect(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.timer = datetime.datetime.now()
         self.time_delta = speed * 1000
-        self.second_animation = 0
         self.recursive = recursive
         self.image = animation[0]
         self.effect = animation
@@ -18,7 +17,6 @@ class Effect(pygame.sprite.Sprite):
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
     def update(self, move):
-        self.second_animation += 1
         stadia = (datetime.datetime.now() - self.timer).microseconds // self.time_delta
         if stadia >= len(self.effect) and self.recursive:
             stadia = 0

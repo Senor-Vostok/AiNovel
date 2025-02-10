@@ -189,6 +189,9 @@ class Surface:
     def add(self, widget):
         self.widgets.append(widget)
 
+    def delete(self, widget):
+        self.widgets.remove(widget)
+
     def update(self, mouse_click, screen, command=None):
         for i in self.widgets:
             i.update(mouse_click, command)
@@ -241,6 +244,7 @@ class DropDown(pygame.sprite.Sprite):
     def __init__(self, images, xoy, texts):
         pygame.sprite.Sprite.__init__(self)
         self.center = images[3].get_rect(center=xoy)
+        self.center.x += images[3].get_rect()[2] / 2
         self.is_open = False
         self.selected_text = InteractLabel([images[0], images[0]], (self.center.x - images[1].get_rect()[2] / 2, self.center.y), False)
         self.selected_text.text = texts[0]
@@ -278,7 +282,6 @@ class Figure(pygame.sprite.Sprite):
     def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=0):
         pygame.sprite.Sprite.__init__(self)
         self.local_form = form
-        self.global_form = list(list())
         self.local_center = []
         self.xoy = xoy
         self.color = color

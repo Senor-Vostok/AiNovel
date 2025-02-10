@@ -14,7 +14,6 @@ from Engine.Logic.ShowInterface import *
 
 class EventHandler:
     def __init__(self):
-        pygame.init()
         pygame.mixer.init()
         pygame.display.set_caption('Test')
         # self.settings = dict()

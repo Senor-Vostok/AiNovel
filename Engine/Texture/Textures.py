@@ -8,7 +8,7 @@ screen = pygame.display.set_mode()
 
 
 class Textures:
-    def __init__(self):
+    def __init__(self):  # 1920 1080
         self.loaded_textures = dict()
         self.resizer = GetSystemMetrics(0) / 1920
         self.priority = ["UI", "Objects", "Background"]
