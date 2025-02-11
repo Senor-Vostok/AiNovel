@@ -11,6 +11,9 @@ class Sounds:
         # self.click = self.__load_sound(f'data/sounds/click.mp3') example
 
     def __load_sound(self, file):
-        if file not in self.loaded_sound:
-            self.loaded_sound[file] = pygame.mixer.Sound(file)
-        return self.loaded_sound[file]
+        try:
+            if file not in self.loaded_sound:
+                self.loaded_sound[file] = pygame.mixer.Sound(file)
+            return self.loaded_sound[file]
+        except Exception:
+            return None

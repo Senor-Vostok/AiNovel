@@ -11,13 +11,13 @@ sounds = Sounds()
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, image, xoy, active=True, text=None, colors=(Engine.Constants.TEXT_ENABLE, Engine.Constants.TEXT_DISABLE)):
+    def __init__(self, images, xoy, active=True, text=None, colors=(Engine.Constants.TEXT_ENABLE, Engine.Constants.TEXT_DISABLE)):
         pygame.sprite.Sprite.__init__(self)
         self.xoy = xoy
         self.colors = colors
         self.main_color = self.colors[0]
-        self.state = image[0]
-        self.trigger = image[1]
+        self.state = images[0]
+        self.trigger = images[1]
         self.image = self.state
         self.text = text
         self.func = None
@@ -56,11 +56,11 @@ class Button(pygame.sprite.Sprite):
 
 
 class Switch(pygame.sprite.Sprite):
-    def __init__(self, image, xoy, active=False):
+    def __init__(self, images, xoy, active=False):
         pygame.sprite.Sprite.__init__(self)
         self.active = active
-        self.enable = image[0]
-        self.disable = image[1]
+        self.enable = images[0]
+        self.disable = images[1]
         self.one_press = False
         self.func, self.args = None, None
         if self.active:
@@ -89,10 +89,10 @@ class Switch(pygame.sprite.Sprite):
 
 
 class Slicer(pygame.sprite.Sprite):
-    def __init__(self, image, xoy, cuts=1, now_sector=1):
+    def __init__(self, images, xoy, cuts=1, now_sector=1):
         pygame.sprite.Sprite.__init__(self)
-        self.back_image = image[0]
-        self.point_image = image[1]
+        self.back_image = images[0]
+        self.point_image = images[1]
         self.cuts = cuts
         self.func, self.args = None, None
         self.now_sector = now_sector
@@ -117,11 +117,11 @@ class Slicer(pygame.sprite.Sprite):
 
 
 class InteractLabel(pygame.sprite.Sprite):
-    def __init__(self, image, xoy, active=True, center=False):
+    def __init__(self, images, xoy, active=True, center=False):
         pygame.sprite.Sprite.__init__(self)
         self.center = center
-        self.state = image[0]
-        self.flex = image[1]
+        self.state = images[0]
+        self.flex = images[1]
         self.image = self.state
         self.text = ''
         self.func = None
@@ -189,9 +189,6 @@ class Surface:
     def add(self, widget):
         self.widgets.append(widget)
 
-    def delete(self, widget):
-        self.widgets.remove(widget)
-
     def update(self, mouse_click, screen, command=None):
         for i in self.widgets:
             i.update(mouse_click, command)
@@ -199,13 +196,13 @@ class Surface:
 
 
 class Label(pygame.sprite.Sprite):
-    def __init__(self, text, xoy, size, color=DEFAULT_COLOR, centric=True):
+    def __init__(self, text, xoy, pp, color=DEFAULT_COLOR, centric=True):
         pygame.sprite.Sprite.__init__(self)
         text = str(text)
         self.color = color
         self.text = text
-        self.size = size
-        self.font = pygame.font.Font("19363.ttf", size)
+        self.size = pp
+        self.font = pygame.font.Font("19363.ttf", pp)
         self.label = list()
         for text in self.text.split('\n'):
             self.label.append(self.font.render(text, 1, color))

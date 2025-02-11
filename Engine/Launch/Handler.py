@@ -8,7 +8,7 @@ from Engine.Objects.MainCamera import MainCamera
 from Engine.Visual.Efffect import Effect, Information
 from win32api import GetSystemMetrics
 from Engine.Constants import *
-from Engine.Visual.Render import rendering
+from Engine.Visual.Render import Render
 from Engine.Logic.ShowInterface import *
 
 
@@ -36,6 +36,7 @@ class EventHandler:
         self.interfaces = dict()
         self.effects = list()  # Хранит объекты класса Effects
         self.camera = MainCamera()
+        self.render = Render(self)
         show_test(self, self.centre)
         # self.__xoy_information = [self.centre[0] * 2, self.centre[1] * 2 - self.textures.land['barrier'][0].get_rect()[2]]
 
@@ -64,7 +65,7 @@ class EventHandler:
     def update(self):
         self.screen.fill(BACKGROUND_COLOR)
         self.clock.tick()
-        rendering(self, self.logic)
+        self.render.rendering()
 
-    def quit(self):
-        sys.exit()
+    # def quit(self):
+    #     sys.exit()
