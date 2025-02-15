@@ -39,7 +39,7 @@ class MainMenu:
     def update_displayed_entries(self):
         self.surface.widgets = self.base_widget_kit
         cell_height = self.cell_height()
-        vertical_postiion = self.screen_height - cell_height * 2
+        vertical_postiion = self.screen_height - (cell_height * 2)
         horizontal_position = self.screen_width // 2
         for entry in self.entries:
             button_trigger_figure = self.create_button_figures((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color, cell_height)
@@ -83,7 +83,7 @@ class MainMenu:
 
         bottom_right = [horizontal_distance(), -vertical_distance()]
         print(bottom_left, top_left, top_right, bottom_right)
-        print(position)
+        print("potition", position)
 
         return Figure(xoy=position,
                       color=color,
