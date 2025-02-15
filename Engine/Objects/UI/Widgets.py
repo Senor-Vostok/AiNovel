@@ -189,6 +189,10 @@ class Surface:
     def add(self, widget):
         self.widgets.append(widget)
 
+    def delete(self, widget):
+        if widget in self.widgets:
+            self.widgets.remove(widget)
+
     def update(self, mouse_click, screen, command=None):
         for i in self.widgets:
             i.update(mouse_click, command)

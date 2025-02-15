@@ -37,7 +37,7 @@ class EventHandler:
         self.effects = list()  # Хранит объекты класса Effects
         self.camera = MainCamera()
         self.render = Render(self)
-        show_UI(self, self.centre, self.size)
+        show_UI(self, self.centre)
         # self.__xoy_information = [self.centre[0] * 2, self.centre[1] * 2 - self.textures.land['barrier'][0].get_rect()[2]]
 
     # def change_volume(self, slicer, channel):
