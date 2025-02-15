@@ -1,6 +1,6 @@
-from Engine.Objects.UI.Interfaces import *
+from Engine.Objects.UI import Interfaces
 
 
-def show_test(self, centre):
-    test = Test(None, centre, self.textures)
-    self.interfaces['test'] = test
+def show_UI(self, centre, size):
+    # self.interfaces['test'] = Interfaces.Test(None, centre, size, self.textures)
+    self.interfaces['main_menu'] = Interfaces.MainMenu(None, centre, size, self.textures)

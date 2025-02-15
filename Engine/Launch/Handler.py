@@ -37,7 +37,7 @@ class EventHandler:
         self.effects = list()  # Хранит объекты класса Effects
         self.camera = MainCamera()
         self.render = Render(self)
-        show_test(self, self.centre)
+        show_UI(self, self.centre, self.size)
         # self.__xoy_information = [self.centre[0] * 2, self.centre[1] * 2 - self.textures.land['barrier'][0].get_rect()[2]]
 
     # def change_volume(self, slicer, channel):
@@ -67,5 +67,5 @@ class EventHandler:
         self.clock.tick()
         self.render.rendering()
 
-    # def quit(self):
-    #     sys.exit()
+    def quit(self):
+         sys.exit()
