@@ -23,11 +23,13 @@ class Entry:
 
 class MainMenu:
     def __init__(self, language_data, xoy, size, textures):
-        self.entries = [Entry("story 1")]
+        self.entries = [Entry("story 1"), Entry("story 2")]
         self.surface = Surface()
         self.base_widget_kit = []
-        self.screen_height = size[0]
-        self.screen_width = size[1]
+        # self.screen_height = xoy[1] * 2
+        self.screen_height = 1080
+        # self.screen_width = xoy[0] * 2
+        self.screen_width = 1920
         self.button_state_color = (48, 35, 22, 0)
         self.button_trigger_color = (48, 35, 22, 255)
         self.horizontal_screen_center = xoy[0]
@@ -40,10 +42,14 @@ class MainMenu:
         vertical_postiion = self.screen_height - cell_height * 2
         horizontal_position = self.screen_width // 2
         for entry in self.entries:
+            button_trigger_figure = self.create_button_figures((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color, cell_height)
+            button_trigger_figure, button_state_figure = self.create_button_figures((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color, cell_height)
+            print(button_state_figure.color)
+
             entry_button = Button(xoy=(horizontal_position, vertical_postiion),
-                                    images=[self.create_button_figure((horizontal_position, vertical_postiion), entry.text, self.button_state_color).surface,
-                                            self.create_button_figure((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color).surface],
-                                    text=entry.text)
+                                  images=[button_state_figure.surface, button_trigger_figure.surface],
+                                  text=entry.text)
+
             if entry.function is not None:
                 entry_button.connect(entry.function)
             self.surface.widgets.append(entry_button)
@@ -54,27 +60,36 @@ class MainMenu:
     def cell_height(self) -> int:
         amount_of_entries = len(self.entries)
         amount_of_cells = amount_of_entries * 2 + amount_of_entries + 1
+        print(self.screen_height)
         return self.screen_height // amount_of_cells
 
-    def create_button_figure(self, position, button_text:str, color:tuple[int, int, int, int], max_height = None) -> Figure:
+    def create_button_figures(self, position, button_text:str, color:tuple[int, int, int, int], max_height: int) -> tuple[Figure,Figure]:
         if max_height is None:
             max_height = self.cell_height()
+        print(max_height)
         max_vertical_distance = max_height  // 2
-        max_horizontal_distance = max_height * len(button_text)
+        horizontal_figure_limit = int(self.screen_width - (0.1 * self.screen_width)) // 2
+        max_horizontal_distance = min(max_height * len(button_text), horizontal_figure_limit)
 
-        vertical_distance = lambda: random.randint(int(max_vertical_distance - 0.1 * max_vertical_distance), max_vertical_distance)
+        vertical_distance = lambda: random.randint(int(max_vertical_distance - (0.1 * max_vertical_distance)), max_vertical_distance)
 
-        horizontal_distance = lambda: random.randint(int(max_horizontal_distance - 0.1 * max_horizontal_distance), max_horizontal_distance)
+        horizontal_distance = lambda: random.randint(int(max_horizontal_distance - (0.1 * max_horizontal_distance)), max_horizontal_distance)
 
-        bottom_left = [-vertical_distance(), -horizontal_distance()]
+        bottom_left = [-horizontal_distance(), -vertical_distance()]
 
-        top_left = [vertical_distance(), -horizontal_distance()]
+        top_left = [-horizontal_distance(), vertical_distance()]
 
         top_right = [horizontal_distance(), vertical_distance()]
 
         bottom_right = [horizontal_distance(), -vertical_distance()]
+        print(bottom_left, top_left, top_right, bottom_right)
+        print(position)
 
         return Figure(xoy=position,
                       color=color,
-                      form=[bottom_left, top_left, top_right, bottom_right],
-                      thickness=2)
+                      form=[top_left, top_right, bottom_right, bottom_left],
+                      thickness=2),\
+                Figure(xoy=position,
+                       color=(0,0,0,0,),
+                       form=[top_left, top_right, bottom_right, bottom_left],
+                       thickness=2)
