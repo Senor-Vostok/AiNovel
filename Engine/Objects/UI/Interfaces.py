@@ -24,6 +24,8 @@ class Entry:
 
 class MainMenu:
     def __init__(self, language_data, xoy, textures):
+
+        #example entries
         self.entries = [Entry("story 1"),
                         Entry("story 2"),
                         Entry("story 3"),
@@ -43,8 +45,11 @@ class MainMenu:
         self.screen_height = xoy[1] * 2
         self.screen_width = xoy[0] * 2
         print(f"Screen Dimensions: {self.screen_width}×{self.screen_height}")
+
+        # цвета будут определяться с помощью цвета фона, фоны при наведении — меняться, поэтому для каждой кнопки свой цвет обводки
         self.button_state_color = (48, 35, 22, 0)
         self.button_trigger_color = (48, 35, 22, 255)
+
         self.update_displayed_entries()
 
     def update_displayed_entries(self):
