@@ -48,6 +48,7 @@ class MainMenu:
         self.update_displayed_entries()
 
     def update_displayed_entries(self):
+        print("amount of entries: ", len(self.entries))
         self.surface.widgets = self.base_widget_kit
         cell_height = self.cell_height()
         print("Cell height: ", cell_height)
@@ -60,7 +61,7 @@ class MainMenu:
             if entry.function is not None:
                 entry_button.connect(entry.function)
             self.surface.widgets.append(entry_button)
-            vertical_postiion += cell_height * 2
+            vertical_postiion += cell_height * 3
 
     def cell_height(self) -> int:
         amount_of_entries = len(self.entries)
@@ -71,8 +72,8 @@ class MainMenu:
         if max_height is None:
             max_height = self.cell_height()
         max_vertical_distance = max_height // 2
-        horizontal_figure_limit = int(self.screen_width - (0.1 * self.screen_width)) // 2
-        max_horizontal_distance = min(max_height * len(button_text), horizontal_figure_limit)
+        horizontal_safe_zone_size = int(self.screen_width - (0.1 * self.screen_width)) // 2
+        max_horizontal_distance = min(max_height * len(button_text), horizontal_safe_zone_size)
         vertical_distance = lambda: random.randint(int(max_vertical_distance - (0.1 * max_vertical_distance)),
                                                    max_vertical_distance)
         horizontal_distance = lambda: random.randint(int(max_horizontal_distance - (0.1 * max_horizontal_distance)),
