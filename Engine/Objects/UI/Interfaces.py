@@ -24,11 +24,25 @@ class Entry:
 
 class MainMenu:
     def __init__(self, language_data, xoy, textures):
-        self.entries = [Entry("story 1"), Entry("story 2")]
+        self.entries = [Entry("story 1"),
+                        Entry("story 2"),
+                        Entry("story 3"),
+                        Entry("Story 4"),
+                        Entry("Story 5"),
+                        Entry("Story 6"),
+                        Entry("Story 7"),
+                        Entry("Story 8"),
+                        Entry("Story 9"),
+                        Entry("Story 10"),]
+        # self.entries = [Entry("story 1"),
+        #                 Entry("story 2"),
+        #                 Entry("story 3")]
+
         self.surface = Surface()
         self.base_widget_kit = []
         self.screen_height = xoy[1] * 2
         self.screen_width = xoy[0] * 2
+        print(f"Screen Dimensions: {self.screen_width}×{self.screen_height}")
         self.button_state_color = (48, 35, 22, 0)
         self.button_trigger_color = (48, 35, 22, 255)
         self.update_displayed_entries()
@@ -36,29 +50,26 @@ class MainMenu:
     def update_displayed_entries(self):
         self.surface.widgets = self.base_widget_kit
         cell_height = self.cell_height()
-        vertical_postiion = self.screen_height // 2 - cell_height
+        print("Cell height: ", cell_height)
+        vertical_postiion = 0  + cell_height * 2
         horizontal_position = self.screen_width // 2
         for entry in self.entries:
-            # button_trigger_figure = self.create_button_figures((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color, cell_height)
-            button_trigger_figure, button_state_figure = self.create_button_figures((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color, cell_height)
-            print(button_state_figure.color)
+            print(vertical_postiion)
+            button_trigger_figure, button_state_figure = self.create_button_figures((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color, max_height=cell_height * 2)
             entry_button = Button(xoy=(horizontal_position, vertical_postiion), images=[button_state_figure.surface, button_trigger_figure.surface], text=entry.text)
             if entry.function is not None:
                 entry_button.connect(entry.function)
             self.surface.widgets.append(entry_button)
-            print(self.surface.widgets[-1])
             vertical_postiion += cell_height * 2
 
     def cell_height(self) -> int:
         amount_of_entries = len(self.entries)
         amount_of_cells = amount_of_entries * 2 + amount_of_entries + 1
-        print(self.screen_height)
         return self.screen_height // amount_of_cells
 
     def create_button_figures(self, position, button_text: str, color: tuple[int, int, int, int], max_height: int) -> tuple[Figure, Figure]:
         if max_height is None:
             max_height = self.cell_height()
-        print(max_height)
         max_vertical_distance = max_height // 2
         horizontal_figure_limit = int(self.screen_width - (0.1 * self.screen_width)) // 2
         max_horizontal_distance = min(max_height * len(button_text), horizontal_figure_limit)
@@ -70,8 +81,6 @@ class MainMenu:
         top_left = [-horizontal_distance(), vertical_distance()]
         top_right = [horizontal_distance(), vertical_distance()]
         bottom_right = [horizontal_distance(), -vertical_distance()]
-        print(bottom_left, top_left, top_right, bottom_right)
-        print("potition", position)
         return Figure(xoy=position,
                       color=color,
                       form=[top_left, top_right, bottom_right, bottom_left],
