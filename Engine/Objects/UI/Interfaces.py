@@ -121,13 +121,13 @@ class MainMenu:
         bottom_right = [horizontal_distance(), -vertical_distance()]
 
         return W.Figure(xoy=position,
-                      color=color,
-                      form=[top_left, top_right, bottom_right, bottom_left],
-                      thickness=2), \
+                        color=color,
+                        form=[top_left, top_right, bottom_right, bottom_left],
+                        thickness=2), \
                W.Figure(xoy=position,
-                      color=(0, 0, 0, 0,),
-                      form=[top_left, top_right, bottom_right, bottom_left],
-                      thickness=2)
+                        color=(0, 0, 0, 0,),
+                        form=[top_left, top_right, bottom_right, bottom_left],
+                        thickness=2)
 
 class NewStoryCreationScreen:
     def __init__(self, language_data, xoy, textures):
@@ -137,6 +137,7 @@ class NewStoryCreationScreen:
         print(screen_width)
         print(xoy[0])
         left_column_horizontal_position = screen_width * 0.1
+        right_column_horizontal_position = screen_width - screen_width * 0.4
         print(left_column_horizontal_position)
 
         self.title = W.Label(text="Новая история",
@@ -147,13 +148,44 @@ class NewStoryCreationScreen:
                                    xoy=(left_column_horizontal_position, screen_height * 0.2),
                                    pp=80, color=(0, 0, 0), centric=False)
 
+        actors_vertical_position = screen_height * 0.3
         self.actors_label = W.Label(text="Действующие лица",
-                                    xoy=(left_column_horizontal_position, screen_height * 0.3),
+                                    xoy=(left_column_horizontal_position, actors_vertical_position),
                                     pp=80, color=(0, 0, 0), centric=False)
+
+        add_actors_plus_symbol_line_half_length = 20
+        add_actors_plus_symbol_line_half_width = 2
+        add_actors_plus_symbol_position = (right_column_horizontal_position, actors_vertical_position)
+
+        bottom_left_plus_point = [-add_actors_plus_symbol_line_half_width, -add_actors_plus_symbol_line_half_length]
+        bottom_right_plus_point = [add_actors_plus_symbol_line_half_width, -add_actors_plus_symbol_line_half_length]
+        top_left_plus_point = [-add_actors_plus_symbol_line_half_width, add_actors_plus_symbol_line_half_length]
+        top_right_plus_point = [add_actors_plus_symbol_line_half_width, add_actors_plus_symbol_line_half_length]
+        print(bottom_left_plus_point, top_left_plus_point, top_right_plus_point, bottom_right_plus_point)
+
+        left_bottom_plus_point = [-add_actors_plus_symbol_line_half_length, -add_actors_plus_symbol_line_half_width]
+        left_top_plus_point = [-add_actors_plus_symbol_line_half_length, add_actors_plus_symbol_line_half_width]
+        right_top_plus_point = [add_actors_plus_symbol_line_half_length, add_actors_plus_symbol_line_half_width]
+        right_bottom_plus_point = [add_actors_plus_symbol_line_half_length, -add_actors_plus_symbol_line_half_width]
+
+        add_actors_plus_symbol_vertical = W.Figure(xoy=add_actors_plus_symbol_position,
+                                                        color=(0, 0, 0),
+                                                        form=[bottom_left_plus_point, top_left_plus_point,
+                                                              top_right_plus_point, bottom_right_plus_point],
+                                                        thickness=1)
+
+        add_actors_plus_symbol_horizontal = W.Figure(xoy=add_actors_plus_symbol_position,
+                                                        color=(0, 0, 0),
+                                                        form=[left_bottom_plus_point, left_top_plus_point,
+                                                              right_top_plus_point, right_bottom_plus_point],
+                                                     thickness=1)
+
+        self.add_actors_plus_symbol = [add_actors_plus_symbol_vertical, add_actors_plus_symbol_horizontal]
 
         self.desctiption_label = W.Label(text="Описание или вступление:",
                                          xoy=(left_column_horizontal_position, screen_height * 0.45),
                                          pp=80, color=(0, 0, 0), centric=False)
+
 
 
         description_field_position = (xoy[0], screen_height * 0.7)
@@ -178,6 +210,8 @@ class NewStoryCreationScreen:
                                                  form=[top_left, top_right, bottom_right, bottom_left],
                                                  thickness=2)
 
-        self.elements = [self.title, self.genre_label, self.actors_label, self.desctiption_label, self.description_field_figure]
+
+
+        self.elements = [self.title, self.genre_label, self.actors_label, self.desctiption_label, self.description_field_figure] + self.add_actors_plus_symbol
 
         self.surface = W.Surface(*self.elements)
