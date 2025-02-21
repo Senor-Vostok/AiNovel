@@ -252,7 +252,7 @@ class Surface:
             i.draw(screen)
 
 
-class Label(pygame.sprite.Sprite):
+class Label(pygame.sprite.Sprite): # если хотите переносить на другую строчку нужно в тексте указывать \n сам класс не определяет момент переноса
     def __init__(self, text, xoy, pp, color=DEFAULT_COLOR, centric=True):
         pygame.sprite.Sprite.__init__(self)
         text = str(text)
@@ -260,12 +260,26 @@ class Label(pygame.sprite.Sprite):
         self.text = text
         self.size = pp
         self.font = pygame.font.Font("19363.ttf", pp)
-        self.label = list()
+        self.label = []
+        self.current_label = 0
         for text in self.text.split('\n'):
             self.label.append(self.font.render(text, 1, color))
         self.rect = self.label[0].get_rect(center=xoy)
         if not centric:
             self.rect.x, self.rect.y = xoy
+        self.scroll_offset = 0
+        self.scrollbar_width = 10
+        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width + 10, 0, self.scrollbar_width,
+                                          self.rect.height)
+        self.scrollbar_handle_height = 50
+        self.scrollbar_dragging = False
+        self.surface = None
+        self.create_surface()
+
+    def create_surface(self):
+        self.surface = pygame.Surface((self.rect.width + 10, self.rect.height))
+        self.surface.fill((255, 224, 0))  # можно поставить BACKGROUND_COLOR
+        pygame.draw.rect(self.surface, (255, 224, 0), self.rect)
 
     def new_text(self, text):
         text = str(text)
@@ -274,11 +288,39 @@ class Label(pygame.sprite.Sprite):
             self.label.append(self.font.render(text, 1, self.color))
 
     def draw(self, screen):
-        for i in range(len(self.label)):
-            screen.blit(self.label[i], (self.rect.x, self.rect.y + self.size * 1.5 * i))
+        self.surface.fill((255, 224, 0))
+        y_offset = -self.scroll_offset
 
-    def update(self, mouse_click, command):
-        pass
+        for idx, line in enumerate(self.label):
+            self.surface.blit(line, (0, y_offset))
+            y_offset += self.size * 1.5
+        total_text_height = len(self.label) * self.size * 1.5
+        if total_text_height > self.rect.height:
+            scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
+            scrollbar_handle_height = (self.rect.height / total_text_height) * self.rect.height
+            pygame.draw.rect(self.surface, (200, 200, 200), self.scrollbar_rect)
+            pygame.draw.rect(self.surface, (100, 100, 100),
+                             (self.scrollbar_rect.x, scrollbar_handle_y,
+                              self.scrollbar_width, scrollbar_handle_height))
+
+        screen.blit(self.surface, (self.rect.x, self.rect.y))
+
+    def update(self, mouse_click, command=None):
+        if mouse_click:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.scrollbar_rect.collidepoint(mouse_pos[0] - self.rect.x, mouse_pos[1] - self.rect.y):
+                if mouse_click[0]:
+                    self.scrollbar_dragging = True
+
+        if not pygame.mouse.get_pressed()[0]:
+            self.scrollbar_dragging = False
+
+        if self.scrollbar_dragging:
+            mouse_pos = pygame.mouse.get_pos()
+            total_text_height = len(self.label) * self.size * 1.5
+            scrollbar_handle_y = mouse_pos[1] - self.rect.y
+            self.scroll_offset = (scrollbar_handle_y / self.rect.height) * total_text_height
+            self.scroll_offset = max(0, min(self.scroll_offset, total_text_height - self.rect.height))
 
 
 class Image(pygame.sprite.Sprite):

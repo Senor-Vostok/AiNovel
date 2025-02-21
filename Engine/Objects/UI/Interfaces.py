@@ -12,8 +12,9 @@ class Test:  # Специально для Богданчика пример с 
                              color_bord=(252, 0, 0, 0))
         self.label = InteractLabel(images=[pygame.image.load('C:/Users/alber/Downloads/Board.png'),
                                           pygame.image.load('C:/Users/alber/Downloads/Board1.png')], xoy=xoy)
+        self.label_norm = Label('jsddjskdjakdjkajdsdfsdfds\nfdsfsdfsdfdsfdk', xoy=xoy, pp=50)
         self.surface = Surface(self.label)
 
         self.dropdown = DropDown(textures.DropDown["selected"] + textures.DropDown["arrow"] + textures.DropDown["variant"], (xoy[0], xoy[1] + 200), ("1", "2", "3", "4", "5"))
         self.background = Image(textures.locations["InsideTheCircusTent"][0], xoy)
-        self.surface = Surface(self.label)
+        self.surface = Surface(self.label_norm)
