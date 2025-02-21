@@ -10,8 +10,8 @@ class Test:  # Специально для Богданчика пример с 
                              color_bord=(252, 0, 0, 255))
         self.circle = Circle([xoy[0], xoy[1] + 200], (48, 35, 22, 255), radius=100, thickness=2,
                              color_bord=(252, 0, 0, 0))
-        self.label = InteractLabel(images=[pygame.image.load('C:/Users/alber/Downloads/Board.png'),
-                                          pygame.image.load('C:/Users/alber/Downloads/Board1.png')], xoy=xoy)
+        self.label = InteractLabel(images=[pygame.image.load('Board.png'),
+                                          pygame.image.load('Board1.png')], xoy=xoy)
         self.label_norm = Label('jsddjskdjakdjkajdsdfsdfds\nfdsfsdfsdfdsfdk', xoy=xoy, pp=50)
         self.surface = Surface(self.label)
 
