@@ -3,7 +3,7 @@ import math
 import pygame
 from datetime import datetime
 import Engine.Constants
-from Engine.Constants import DEFAULT_COLOR, TEXT_BOARD_PLACEMENT
+from Engine.Constants import DEFAULT_COLOR, BACKGROUND_COLOR
 from Engine.Sound.Sounds import Sounds
 from win32api import GetSystemMetrics
 
@@ -145,41 +145,41 @@ class InteractLabel(pygame.sprite.Sprite):
         self.create_surface()
 
     def create_surface(self):
-        self.surface = pygame.Surface((self.rect.width, self.rect.height))
-        self.surface.fill((255, 224, 0)) # можно поставить BACKGROUND_COLOR
+        self.surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+        self.surface.fill((233, 217, 202, 0))
         self.fill_surface()
 
     def fill_surface(self):
-        pygame.draw.rect(self.surface, (255, 224, 0), self.rect)
+        pygame.draw.rect(self.surface, (233, 217, 202, 0), self.rect)
 
     def draw(self, screen):
-        self.surface.fill((255, 224, 0))
+        self.surface.fill((233, 217, 202, 0))
         y_offset = -self.scroll_offset
         for idx, line in enumerate(self.text):
             text_surface = self.font.render(line, False, (0, 0, 0))
-            if text_surface.get_width() > self.rect.width - TEXT_BOARD_PLACEMENT:
+            if text_surface.get_width() > self.rect.width * 0.9:
                 words = line.split('|')
                 new_line = ''
                 for word in words:
-                    test_line = new_line + word + '|'
-                    if self.font.size(test_line)[0] < self.rect.width - TEXT_BOARD_PLACEMENT:
+                    test_line = new_line + word
+                    if self.font.size(test_line)[0] < self.rect.width * 0.9:
                         new_line = test_line
                     else:
                         self.surface.blit(self.font.render(new_line, False, (0, 0, 0)), (5, y_offset))
-                        new_line = word + '|'
+                        new_line = word
                 self.surface.blit(self.font.render(new_line, False, (0, 0, 0)), (5, y_offset))
                 y_offset += self.font.get_height()
             else:
                 self.surface.blit(text_surface, (5, y_offset))
                 y_offset += self.font.get_height()
-        total_text_height = y_offset + self.scroll_offset
-        if total_text_height > self.rect.height:
-            scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
-            scrollbar_handle_height = (self.rect.height / total_text_height) * self.rect.height
-            pygame.draw.rect(self.surface, (200, 200, 200), self.scrollbar_rect)
-            pygame.draw.rect(self.surface, (100, 100, 100),
-                             (self.scrollbar_rect.x, scrollbar_handle_y,
-                              self.scrollbar_width, scrollbar_handle_height))
+        total_text_height = self.font.get_height() * len(self.text)
+        scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
+        scrollbar_handle_height = (self.rect.height / total_text_height) * self.rect.height
+        pygame.draw.rect(self.surface, (200, 200, 200), self.scrollbar_rect)
+        pygame.draw.rect(self.surface, (100, 100, 100),
+                         (self.scrollbar_rect.x, scrollbar_handle_y,
+                            self.scrollbar_width, scrollbar_handle_height))
+        screen.blit(self.image, (self.rect.x, self.rect.y))
         screen.blit(self.surface, (self.rect.x, self.rect.y))
 
     def connect(self, func, *args):
@@ -232,7 +232,7 @@ class InteractLabel(pygame.sprite.Sprite):
                     self.func(*self.args)
             elif len(str(command.unicode)) > 0 and command.type == pygame.KEYDOWN:
                 self.text[self.current_text] = self.text[self.current_text] + command.unicode
-                if self.font.size(self.text[self.current_text])[0] > self.rect.width - TEXT_BOARD_PLACEMENT:
+                if self.font.size(self.text[self.current_text])[0] > self.rect.width * 0.9:
                     self.current_text += 1
                     self.text.append('')
 
@@ -278,8 +278,8 @@ class Label(pygame.sprite.Sprite): # если хотите переносить 
 
     def create_surface(self):
         self.surface = pygame.Surface((self.rect.width + 10, self.rect.height))
-        self.surface.fill((255, 224, 0))  # можно поставить BACKGROUND_COLOR
-        pygame.draw.rect(self.surface, (255, 224, 0), self.rect)
+        self.surface.fill(BACKGROUND_COLOR)
+        pygame.draw.rect(self.surface, BACKGROUND_COLOR, self.rect)
 
     def new_text(self, text):
         text = str(text)
@@ -288,7 +288,7 @@ class Label(pygame.sprite.Sprite): # если хотите переносить 
             self.label.append(self.font.render(text, 1, self.color))
 
     def draw(self, screen):
-        self.surface.fill((255, 224, 0))
+        self.surface.fill(BACKGROUND_COLOR)
         y_offset = -self.scroll_offset
 
         for idx, line in enumerate(self.label):

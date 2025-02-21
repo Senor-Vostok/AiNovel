@@ -17,4 +17,3 @@ class Test:  # Специально для Богданчика пример с 
 
         self.dropdown = DropDown(textures.DropDown["selected"] + textures.DropDown["arrow"] + textures.DropDown["variant"], (xoy[0], xoy[1] + 200), ("1", "2", "3", "4", "5"))
         self.background = Image(textures.locations["InsideTheCircusTent"][0], xoy)
-        self.surface = Surface(self.label_norm)
