@@ -16,4 +16,5 @@ def show_UI(handler, centre):
     #                                                             Entry("Story 9"),
     #                                                             Entry("Story 10")])
 
-    handler.interfaces['new_story_creation_screen'] = Interfaces.NewStoryCreationScreen(None, centre, handler.textures)
+def show_UI(handler, centre):
+    handler.interfaces['main_menu'] = Interfaces.MainMenu(None, centre, handler.textures, handler.saves_story)

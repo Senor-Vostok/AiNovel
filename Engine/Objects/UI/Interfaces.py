@@ -29,68 +29,46 @@ class Test:
 
 
 class MainMenu:
-    def __init__(self, language_data, xoy, textures, entries):
+    def __init__(self, language_data, xoy, textures, saves_story):
         global screen_width
         global screen_height
-
+        self.textures = textures
         set_screen_size(xoy)
-
-        #example entries
-        if entries is not None:
-            self.entries = entries
-        else:
-            self.entries = [W.Entry("story 1"),
-                            W.Entry("story 2"),
-                            W.Entry("story 3"),
-                            W.Entry("Story 4"),
-                            W.Entry("Story 5"),
-                            W.Entry("Story 6"),
-                            W.Entry("Story 7"),
-                            W.Entry("Story 8"),
-                            W.Entry("Story 9"),
-                            W.Entry("Story 10")]
-            # handler.entries = [W.Entry("story 1"),
-            #                 W.Entry("story 2"),
-            #                 W.Entry("story 3")]
-
+        self.entries = [Entry(story["name"], story["launch"]) for story in saves_story]
+        self.entries.append(Entry("Новая история"))
         self.surface = W.Surface()
         self.base_widget_kit = []
+        self.button_state_color = (0, 0, 0, 0)
+        self.button_trigger_color = (196, 73, 0, 255)
 
 
         print(f"Screen Dimensions: {screen_width}×{screen_height}")
 
-        # цвета будут определяться с помощью цвета фона, фоны при наведении — меняться, поэтому для каждой кнопки свой цвет обводки
-        self.button_state_color = (48, 35, 22, 0)
-        self.button_trigger_color = (48, 35, 22, 255)
+        # Константы заполнения интерфейса
+        self.VERTICAL_PERCENT_FILLING = 0.5
+        self.HORIZONTAL_PERCENT_FILLING = 0.5
 
+        image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
+        self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
+        xoy_image = (image.get_rect()[2] / 2 + 10 * self.textures.resizer, self.screen_height - image.get_rect()[3] / 2 -  + 10 * self.textures.resizer)
+        self.base_widget_kit.append(Image(image, xoy_image))
         self.update_displayed_entries()
 
 
     def update_displayed_entries(self):
-        print("amount of entries: ", len(self.entries))
         self.surface.widgets = self.base_widget_kit
         cell_height = self.cell_height()
         print("Cell height: ", cell_height)
-        vertical_postiion = 0 + cell_height * 2
+        vertical_position = (screen_height * (1 - self.VERTICAL_PERCENT_FILLING)) / 2  + cell_height * 2
         horizontal_position = screen_width // 2
         for entry in self.entries:
             print(vertical_postiion)
-
-            button_trigger_figure, button_state_figure = \
-                  self.create_button_figures((horizontal_position, vertical_postiion),
-                                              entry.text,
-                                              self.button_trigger_color,
-                                              max_height=cell_height * 2)
-
-            entry_button = W.Button(xoy=(horizontal_position, vertical_postiion),
-                                  images=[button_state_figure.surface, button_trigger_figure.surface],
-                                  text=entry.text)
-
+            button_trigger_figure, button_state_figure = self.create_button_figures((horizontal_position, vertical_postiion), entry.text, self.button_trigger_color, max_height=cell_height * 2)
+            entry_button = W.Button(xoy=(horizontal_position, vertical_postiion), images=[button_state_figure.surface, button_trigger_figure.surface], text=entry.text)
             if entry.function is not None:
                 entry_button.connect(entry.function)
-
             self.surface.widgets.append(entry_button)
-            vertical_postiion += cell_height * 3
+            vertical_position += cell_height * 3
 
 
     def cell_height(self) -> int:
@@ -98,36 +76,31 @@ class MainMenu:
         global screen_width
         amount_of_entries = len(self.entries)
         amount_of_cells = amount_of_entries * 2 + amount_of_entries + 1
-        return screen_height // amount_of_cells
+        return int((screen_height * self.VERTICAL_PERCENT_FILLING) // amount_of_cells)
 
 
-    def create_button_figures(self, position, button_text: str, color: tuple[int, int, int, int], max_height) -> tuple[W.Figure, W.Figure]:
-
-        if max_height is None:
-            max_height = self.cell_height()
+    def create_button_figures(self, position, button_text: str, color: tuple[...], max_height) -> tuple[W.Figure, W.Figure]:
+        max_height = self.cell_height() if not max_height else max_height
 
         max_vertical_distance = max_height // 2
         horizontal_safe_zone_size = int(screen_width - (0.1 * screen_width)) // 2
-        max_horizontal_distance = min(max_height * len(button_text), horizontal_safe_zone_size)
-
-        vertical_distance = lambda: random.randint(int(max_vertical_distance - (0.1 * max_vertical_distance)),
-                                                   max_vertical_distance)
-        horizontal_distance = lambda: random.randint(int(max_horizontal_distance - (0.1 * max_horizontal_distance)),
-                                                     max_horizontal_distance)
-
+        # Создание псевдо текста и его длины
+        font = pygame.font.Font("19363.ttf", max_height - max_height // 3)
+        LabelText = font.render(button_text, 1, (0, 0, 0)).get_rect()[2]
+        #
+        max_horizontal_distance = min(LabelText, horizontal_safe_zone_size)
+        vertical_distance = lambda: random.randint(int(max_vertical_distance - (0.1 * max_vertical_distance)), max_vertical_distance)
+        horizontal_distance = lambda: random.randint(int(max_horizontal_distance - (0.1 * max_horizontal_distance)), max_horizontal_distance)
         bottom_left = [-horizontal_distance(), -vertical_distance()]
         top_left = [-horizontal_distance(), vertical_distance()]
         top_right = [horizontal_distance(), vertical_distance()]
         bottom_right = [horizontal_distance(), -vertical_distance()]
-
         return W.Figure(xoy=position,
                         color=color,
-                        form=[top_left, top_right, bottom_right, bottom_left],
-                        thickness=2), \
+                        form=[top_left, top_right, bottom_right, bottom_left]), \
                W.Figure(xoy=position,
                         color=(0, 0, 0, 0,),
-                        form=[top_left, top_right, bottom_right, bottom_left],
-                        thickness=2)
+                        form=[top_left, top_right, bottom_right, bottom_left])
 
 class NewStoryCreationScreen:
     def __init__(self, language_data, xoy, textures):
