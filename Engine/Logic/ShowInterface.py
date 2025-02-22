@@ -1,6 +1,5 @@
 from Engine.Objects.UI import Interfaces
 
 
-def show_UI(self, centre):
-    # self.interfaces['test'] = Interfaces.Test(None, centre, size, self.textures)
-    self.interfaces['main_menu'] = Interfaces.MainMenu(None, centre, self.textures)
+def show_UI(handler, centre):
+    handler.interfaces['main_menu'] = Interfaces.MainMenu(None, centre, handler.textures, handler.saves_story)
