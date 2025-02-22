@@ -339,3 +339,8 @@ class Circle(pygame.sprite.Sprite):
 
     def update(self, mouse_click, command):
         pass
+
+class Entry:
+    def __init__(self, text: str, function=None):
+        self.text = text
+        self.function = function

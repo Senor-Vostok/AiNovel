@@ -16,20 +16,20 @@ class EventHandler:
     def __init__(self):
         pygame.mixer.init()
         pygame.display.set_caption('Test')
-        # self.settings = dict()
-        # self.volumes_channels = [1] * 8
-        # self.language_data = dict()
-        # self.export_language(self.settings['language'])
+        # handler.settings = dict()
+        # handler.volumes_channels = [1] * 8
+        # handler.language_data = dict()
+        # handler.export_language(handler.settings['language'])
         self.size = GetSystemMetrics(0), GetSystemMetrics(1)
         self.centre = (self.size[0] // 2, self.size[1] // 2)
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(self.size, pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.RESIZABLE)
         self.textures = Textures()
-        # self.screen.blit(self.textures.loading, (self.centre[0] - self.textures.loading.get_rect()[2] // 2, self.centre[1] - self.textures.loading.get_rect()[3] // 2))
+        # handler.screen.blit(handler.textures.loading, (handler.centre[0] - handler.textures.loading.get_rect()[2] // 2, handler.centre[1] - handler.textures.loading.get_rect()[3] // 2))
         # pygame.display.flip()
         self.sounds = Sounds()
         # pygame.mouse.set_visible(False)
-        # pygame.mixer.Channel(0).play(self.sounds.menu, -1)
+        # pygame.mixer.Channel(0).play(handler.sounds.menu, -1)
         self.timer, self.timer_backmusic, self.last_interface = None, None, None
         self.logic = Scene(self)
         self.open_some, self.flag = True, True
@@ -43,11 +43,11 @@ class EventHandler:
                             {"name": "История бобра Максима", "launch": None},
                             {"name": "История бобра Максима", "launch": None}]
         show_UI(self, self.centre)
-        # self.__xoy_information = [self.centre[0] * 2, self.centre[1] * 2 - self.textures.land['barrier'][0].get_rect()[2]]
+        # handler.__xoy_information = [handler.centre[0] * 2, handler.centre[1] * 2 - handler.textures.land['barrier'][0].get_rect()[2]]
 
-    # def change_volume(self, slicer, channel):
-    #     self.volumes_channels[channel] = slicer.now_sector / slicer.cuts  # Проценты
-    #     pygame.mixer.Channel(channel).set_volume(self.volumes_channels[channel])
+    # def change_volume(handler, slicer, channel):
+    #     handler.volumes_channels[channel] = slicer.now_sector / slicer.cuts  # Проценты
+    #     pygame.mixer.Channel(channel).set_volume(handler.volumes_channels[channel])
 
     def click_handler(self):
         c = None
@@ -59,7 +59,7 @@ class EventHandler:
                     if len(self.interfaces) > 1:
                         self.interfaces.pop([_ for _ in self.interfaces if self.interfaces[_] == self.last_interface][0])
                         continue
-                    # show_pause(self, self.centre) if 'pause' not in self.interfaces and not self.open_some else None
+                    # show_pause(handler, handler.centre) if 'pause' not in handler.interfaces and not handler.open_some else None
                 if 'popup_menu' in self.interfaces: self.interfaces.pop('popup_menu')
                 if 'buildmenu' in self.interfaces: self.interfaces.pop('buildmenu')
                 if 'choicegame' in self.interfaces: self.interfaces.pop('choicegame')
