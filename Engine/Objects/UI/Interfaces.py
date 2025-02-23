@@ -17,7 +17,6 @@ class Test:
 
         self.circle = W.Circle([xoy[0], xoy[1] + 200], (48, 35, 22, 255), radius=100, thickness=2,
                              color_bord=(252, 0, 0, 0))
-
         self.dropdown = W.DropDown(textures.DropDown["selected"] + textures.DropDown["arrow"] + textures.DropDown["variant"], (xoy[0], xoy[1] + 200), ("1", "2", "3", "4", "5"))
         self.background = W.Image(textures.locations["InsideTheCircusTent"][0], xoy)
         self.surface = W.Surface(self.background, self.image, self.hello, self.figure, self.dropdown)
