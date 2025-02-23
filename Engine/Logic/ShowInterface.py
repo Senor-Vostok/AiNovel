@@ -1,6 +1,6 @@
-from Engine.Objects.UI.Interfaces import *
+from Engine.Objects.UI import Interfaces
+from Engine.Objects.UI import Widgets
 
 
-def show_test(self, centre):
-    test = Test(None, centre, self.textures)
-    self.interfaces['test'] = test
+def show_UI(handler, centre):
+    handler.interfaces['main_menu'] = Interfaces.MainMenu(None, centre, handler.textures, handler.saves_story)

@@ -246,6 +246,10 @@ class Surface:
     def add(self, widget):
         self.widgets.append(widget)
 
+    def delete(self, widget):
+        if widget in self.widgets:
+            self.widgets.remove(widget)
+
     def update(self, mouse_click, screen, command=None):
         for i in self.widgets:
             i.update(mouse_click, command)
@@ -375,7 +379,7 @@ class DropDown(pygame.sprite.Sprite):
 
 
 class Figure(pygame.sprite.Sprite):
-    def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=0):
+    def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=1):
         pygame.sprite.Sprite.__init__(self)
         self.local_form = form
         self.local_center = []
@@ -398,7 +402,7 @@ class Figure(pygame.sprite.Sprite):
         zero_x, zero_y = min([_[0] for _ in self.local_form]), min([_[1] for _ in self.local_form])
         form = [(i[0] - zero_x + self.thickness, i[1] - zero_y + self.thickness) for i in self.local_form]
         pygame.draw.polygon(self.surface, self.color, form)
-        pygame.draw.polygon(self.surface, self.color_bord, form, self.thickness)
+        pygame.draw.polygon(self.surface, self.color_bord, form, self.thickness) if self.color_bord != (0, 0, 0, 0) else None
 
     def draw(self, screen):
         screen.blit(self.surface, (self.xoy[0] - self.local_center[0], self.xoy[1] - self.local_center[1]))
@@ -434,3 +438,8 @@ class Circle(pygame.sprite.Sprite):
 
     def update(self, mouse_click, command):
         pass
+
+class Entry:
+    def __init__(self, text: str, function=None):
+        self.text = text
+        self.function = function
