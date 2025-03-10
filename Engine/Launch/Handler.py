@@ -37,6 +37,11 @@ class EventHandler:
         self.effects = list()  # Хранит объекты класса Effects
         self.camera = MainCamera()
         self.render = Render(self)
+        self.saves_story = [{"name": "История бобра Максима", "launch": None},
+                            {"name": "История бобра Максима", "launch": None},
+                            {"name": "История бобра Максима", "launch": None},
+                            {"name": "История бобра Максима", "launch": None},
+                            {"name": "История бобра Максима", "launch": None}]
         show_UI(self, self.centre)
         # handler.__xoy_information = [handler.centre[0] * 2, handler.centre[1] * 2 - handler.textures.land['barrier'][0].get_rect()[2]]
 
@@ -67,5 +72,5 @@ class EventHandler:
         self.clock.tick()
         self.render.rendering()
 
-    def quit(self):
-         sys.exit()
+    #def quit(self):
+    #     sys.exit()

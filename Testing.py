@@ -10,6 +10,7 @@ from Engine.Sound.Sounds import Sounds
 from Engine.Objects.MainCamera import MainCamera
 from Engine.Visual.Render import Render
 from Engine.Visual.Efffect import *
+from Engine.Objects.UI.Widgets import *
 
 handler = EventHandler()
 testImage = pygame.transform.scale(pygame.image.load("Assets/UI/DropDown/arrow.png"), (10, 10)).convert_alpha()

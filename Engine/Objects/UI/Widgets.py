@@ -3,7 +3,7 @@ import math
 import pygame
 from datetime import datetime
 import Engine.Constants
-from Engine.Constants import DEFAULT_COLOR
+from Engine.Constants import DEFAULT_COLOR, BACKGROUND_COLOR
 from Engine.Sound.Sounds import Sounds
 from win32api import GetSystemMetrics
 
@@ -123,28 +123,64 @@ class InteractLabel(pygame.sprite.Sprite):
         self.state = images[0]
         self.flex = images[1]
         self.image = self.state
-        self.text = ''
+        self.text = ['']
+        self.current_text = 0
         self.func = None
         self.args = None
         self.active = active
         self.rect = self.image.get_rect(center=xoy)
-        self.font = pygame.font.Font("19363.ttf", self.rect[3] - self.rect[3] // 3)
+        self.font = pygame.font.Font("19363.ttf", int(self.rect[3] * 0.3))
         self.timer = datetime.now()
         self.visible = True
         self.can_write = False
+        self.surface = None
+        self.text_image = None
+        self.y = 0
+        self.scroll_offset = 0
+        self.scrollbar_width = 10
+        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width, 0, self.scrollbar_width,
+                                          self.rect.height)
+        self.scrollbar_handle_height = 50
+        self.scrollbar_dragging = False
+        self.create_surface()
+
+    def create_surface(self):
+        self.surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+        self.surface.fill((233, 217, 202, 0))
+        self.fill_surface()
+
+    def fill_surface(self):
+        pygame.draw.rect(self.surface, (233, 217, 202, 0), self.rect)
 
     def draw(self, screen):
+        self.surface.fill((233, 217, 202, 0))
+        y_offset = -self.scroll_offset
+        for idx, line in enumerate(self.text):
+            text_surface = self.font.render(line, False, (0, 0, 0))
+            if text_surface.get_width() > self.rect.width * 0.9:
+                words = line.split('|')
+                new_line = ''
+                for word in words:
+                    test_line = new_line + word
+                    if self.font.size(test_line)[0] < self.rect.width * 0.9:
+                        new_line = test_line
+                    else:
+                        self.surface.blit(self.font.render(new_line, False, (0, 0, 0)), (5, y_offset))
+                        new_line = word
+                self.surface.blit(self.font.render(new_line, False, (0, 0, 0)), (5, y_offset))
+                y_offset += self.font.get_height()
+            else:
+                self.surface.blit(text_surface, (5, y_offset))
+                y_offset += self.font.get_height()
+        total_text_height = self.font.get_height() * len(self.text)
+        scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
+        scrollbar_handle_height = (self.rect.height / total_text_height) * self.rect.height
+        pygame.draw.rect(self.surface, (200, 200, 200), self.scrollbar_rect)
+        pygame.draw.rect(self.surface, (100, 100, 100),
+                         (self.scrollbar_rect.x, scrollbar_handle_y,
+                            self.scrollbar_width, scrollbar_handle_height))
         screen.blit(self.image, (self.rect.x, self.rect.y))
-        image = self.font.render(self.text, False, DEFAULT_COLOR if self.can_write else Engine.Constants.TEXT_DISABLE)
-        i = 1
-        while image.get_rect()[2] < self.rect[2] - 50 and i <= len(self.text):
-            image = self.font.render(self.text[-i:], False,
-                                     DEFAULT_COLOR if self.can_write else Engine.Constants.TEXT_DISABLE)
-            i += 1
-        if not self.center:
-            screen.blit(image, (self.rect[0] + 10, self.rect[1] + 6))
-        else:
-            screen.blit(image, (self.rect[0] + self.rect[2] // 2 - image.get_rect()[2] // 2, self.rect[1] + 6))
+        screen.blit(self.surface, (self.rect.x, self.rect.y))
 
     def connect(self, func, *args):
         self.func = func
@@ -153,31 +189,52 @@ class InteractLabel(pygame.sprite.Sprite):
     def update(self, mouse_click, command=None):
         if not self.active:
             return
-        elif (datetime.now() - self.timer).seconds > 0.15 and not ''.join(self.text.split('/')):
-            self.text = self.text + '/' if self.visible else self.text[:-1]
+        elif (datetime.now() - self.timer).seconds > 0.15 and not ''.join(self.text[self.current_text].split('/')):
+            self.text[self.current_text] = self.text[self.current_text] + '/'\
+                if self.visible else self.text[self.current_text][:-1]
             self.timer = datetime.now()
             self.visible = not self.visible
-        elif not self.rect.colliderect(mouse_click[0], mouse_click[1], 1, 1) and mouse_click[2] and mouse_click[3] == 1:
+        elif (not self.rect.colliderect(pygame.Rect(mouse_click[0], mouse_click[1], 1, 1))
+              and mouse_click[2] and mouse_click[3] == 1):
             self.can_write = False
             self.image = self.state
-        elif self.rect.colliderect(mouse_click[0], mouse_click[1], 1, 1) and mouse_click[2] and mouse_click[3] == 1:
+        elif (self.rect.colliderect(pygame.Rect(mouse_click[0], mouse_click[1], 1, 1))
+              and mouse_click[2] and mouse_click[3] == 1):
             self.can_write = True
             self.image = self.flex
         elif self.can_write:
             self.go_write(command)
+        if self.scrollbar_rect.collidepoint(mouse_click[0] - self.rect.x, mouse_click[1] - self.rect.y):
+            if mouse_click[2]:
+                self.scrollbar_dragging = True
+        elif not mouse_click[2]:
+            self.scrollbar_dragging = False
+        if self.scrollbar_dragging:
+            total_text_height = sum(self.font.size(line)[1] for line in self.text)
+            scrollbar_handle_y = mouse_click[1] - self.rect.y
+            self.scroll_offset = (scrollbar_handle_y / self.rect.height) * total_text_height
+            self.scroll_offset = max(0, min(self.scroll_offset, total_text_height - self.rect.height))
 
     def go_write(self, command):
         if command:
-            self.text = ''.join(self.text.split('/'))
+            self.text[self.current_text] = ''.join(self.text[self.current_text].split('/'))
             if (command.key == pygame.K_v) and (command.mod & pygame.KMOD_CTRL):
-                self.text = self.text + ("".join(str(pygame.scrap.get(pygame.SCRAP_TEXT))[2:].split(r"\x00")))
+                self.text[self.current_text] = (self.text[self.current_text] +
+                                                ("".join(str(pygame.scrap.get(pygame.SCRAP_TEXT))[2:].split(r"\x00"))))
             elif command.key == pygame.K_BACKSPACE:
-                self.text = self.text[:-1]
-            elif int(command.key) == Engine.Constants.KEY_ENTER:
+                if self.text[self.current_text]:
+                    self.text[self.current_text] = self.text[self.current_text][:-1]
+                elif self.current_text > 0:
+                    self.text.pop(self.current_text)
+                    self.current_text -= 1
+            elif command.key == pygame.K_RETURN:
                 if self.func:
                     self.func(*self.args)
             elif len(str(command.unicode)) > 0 and command.type == pygame.KEYDOWN:
-                self.text = self.text + command.unicode
+                self.text[self.current_text] = self.text[self.current_text] + command.unicode
+                if self.font.size(self.text[self.current_text])[0] > self.rect.width * 0.9:
+                    self.current_text += 1
+                    self.text.append('')
 
 
 class Surface:
@@ -199,7 +256,7 @@ class Surface:
             i.draw(screen)
 
 
-class Label(pygame.sprite.Sprite):
+class Label(pygame.sprite.Sprite): # если хотите переносить на другую строчку нужно в тексте указывать \n сам класс не определяет момент переноса
     def __init__(self, text, xoy, pp, color=DEFAULT_COLOR, centric=True):
         pygame.sprite.Sprite.__init__(self)
         text = str(text)
@@ -207,12 +264,26 @@ class Label(pygame.sprite.Sprite):
         self.text = text
         self.size = pp
         self.font = pygame.font.Font("19363.ttf", pp)
-        self.label = list()
+        self.label = []
+        self.current_label = 0
         for text in self.text.split('\n'):
             self.label.append(self.font.render(text, 1, color))
         self.rect = self.label[0].get_rect(center=xoy)
         if not centric:
             self.rect.x, self.rect.y = xoy
+        self.scroll_offset = 0
+        self.scrollbar_width = 10
+        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width + 10, 0, self.scrollbar_width,
+                                          self.rect.height)
+        self.scrollbar_handle_height = 50
+        self.scrollbar_dragging = False
+        self.surface = None
+        self.create_surface()
+
+    def create_surface(self):
+        self.surface = pygame.Surface((self.rect.width + 10, self.rect.height))
+        self.surface.fill(BACKGROUND_COLOR)
+        pygame.draw.rect(self.surface, BACKGROUND_COLOR, self.rect)
 
     def new_text(self, text):
         text = str(text)
@@ -221,11 +292,39 @@ class Label(pygame.sprite.Sprite):
             self.label.append(self.font.render(text, 1, self.color))
 
     def draw(self, screen):
-        for i in range(len(self.label)):
-            screen.blit(self.label[i], (self.rect.x, self.rect.y + self.size * 1.5 * i))
+        self.surface.fill(BACKGROUND_COLOR)
+        y_offset = -self.scroll_offset
 
-    def update(self, mouse_click, command):
-        pass
+        for idx, line in enumerate(self.label):
+            self.surface.blit(line, (0, y_offset))
+            y_offset += self.size * 1.5
+        total_text_height = len(self.label) * self.size * 1.5
+        if total_text_height > self.rect.height:
+            scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
+            scrollbar_handle_height = (self.rect.height / total_text_height) * self.rect.height
+            pygame.draw.rect(self.surface, (200, 200, 200), self.scrollbar_rect)
+            pygame.draw.rect(self.surface, (100, 100, 100),
+                             (self.scrollbar_rect.x, scrollbar_handle_y,
+                              self.scrollbar_width, scrollbar_handle_height))
+
+        screen.blit(self.surface, (self.rect.x, self.rect.y))
+
+    def update(self, mouse_click, command=None):
+        if mouse_click:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.scrollbar_rect.collidepoint(mouse_pos[0] - self.rect.x, mouse_pos[1] - self.rect.y):
+                if mouse_click[0]:
+                    self.scrollbar_dragging = True
+
+        if not pygame.mouse.get_pressed()[0]:
+            self.scrollbar_dragging = False
+
+        if self.scrollbar_dragging:
+            mouse_pos = pygame.mouse.get_pos()
+            total_text_height = len(self.label) * self.size * 1.5
+            scrollbar_handle_y = mouse_pos[1] - self.rect.y
+            self.scroll_offset = (scrollbar_handle_y / self.rect.height) * total_text_height
+            self.scroll_offset = max(0, min(self.scroll_offset, total_text_height - self.rect.height))
 
 
 class Image(pygame.sprite.Sprite):
@@ -280,7 +379,7 @@ class DropDown(pygame.sprite.Sprite):
 
 
 class Figure(pygame.sprite.Sprite):
-    def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=0):
+    def __init__(self, xoy, color, color_bord=(0, 0, 0, 0), form=[...], thickness=1):
         pygame.sprite.Sprite.__init__(self)
         self.local_form = form
         self.local_center = []
@@ -303,7 +402,7 @@ class Figure(pygame.sprite.Sprite):
         zero_x, zero_y = min([_[0] for _ in self.local_form]), min([_[1] for _ in self.local_form])
         form = [(i[0] - zero_x + self.thickness, i[1] - zero_y + self.thickness) for i in self.local_form]
         pygame.draw.polygon(self.surface, self.color, form)
-        pygame.draw.polygon(self.surface, self.color_bord, form, self.thickness)
+        pygame.draw.polygon(self.surface, self.color_bord, form, self.thickness) if self.color_bord != (0, 0, 0, 0) else None
 
     def draw(self, screen):
         screen.blit(self.surface, (self.xoy[0] - self.local_center[0], self.xoy[1] - self.local_center[1]))
