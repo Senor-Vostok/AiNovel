@@ -134,10 +134,9 @@ class NewStoryCreationScreen:
         global screen_height
         global screen_width
         set_screen_size(xoy)
-        print(screen_width)
-        print(xoy[0])
         left_column_horizontal_position = screen_width * 0.1
         right_column_horizontal_position = screen_width - screen_width * 0.4
+        print(f"Screen Dimensions: {screen_width}×{screen_height}")
         print(left_column_horizontal_position)
 
         self.title = W.Label(text="Новая история",

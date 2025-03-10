@@ -2,7 +2,7 @@ from Engine.Objects.UI import Interfaces
 from Engine.Objects.UI import Widgets
 
 def show_UI(handler, centre):
-    # handler.interfaces['test'] = Interfaces.Test(None, centre, size, handler.textures)
+    # handler.interfaces['test'] = Interfaces.Test(None, centre, handler.textures)
     Entry = Widgets.Entry
     # handler.interfaces['main_menu'] = Interfaces.MainMenu(None, centre, handler.textures,
     #                                                       entries=[Entry("story 1"),
