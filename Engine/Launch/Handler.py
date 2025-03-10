@@ -41,6 +41,7 @@ class EventHandler:
                             {"name": "История бобра Максима", "launch": None},
                             {"name": "История бобра Максима", "launch": None},
                             {"name": "История бобра Максима", "launch": None},
+                            {"name": "История бобра Максима", "launch": None},
                             {"name": "История бобра Максима", "launch": None}]
         show_UI(self, self.centre)
         # handler.__xoy_information = [handler.centre[0] * 2, handler.centre[1] * 2 - handler.textures.land['barrier'][0].get_rect()[2]]

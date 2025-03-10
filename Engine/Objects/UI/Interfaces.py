@@ -43,8 +43,8 @@ class MainMenu:
         print(f"Screen Dimensions: {screen_width}×{screen_height}")
 
         # Константы заполнения интерфейса
-        self.VERTICAL_PERCENT_FILLING = 0.5
-        self.HORIZONTAL_PERCENT_FILLING = 0.5
+        self.VERTICAL_PERCENT_FILLING = 0.8
+        self.HORIZONTAL_PERCENT_FILLING = 0.8
 
         image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
         self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
