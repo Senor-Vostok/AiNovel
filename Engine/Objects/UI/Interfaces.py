@@ -177,3 +177,34 @@ class NewStoryCreationScreen:
         self.elements = [self.title, self.genre_label, self.actors_label, self.desctiption_label, self.description_field_figure] + self.add_actors_plus_symbol
 
         self.surface = W.Surface(*self.elements)
+
+
+class DialogueUI:
+    def __init__(self, language_data, xoy, textures, cue):
+        self.character_names = cue.get("Characters_names")
+        self.location = cue.get("Location")
+        self.main_character = cue.get("Main_character")
+        self.dialog = cue.get("Dialog")
+        self.textures = textures
+
+        self.other_characters_images = dict()
+        for character_name in self.character_names:
+            self.other_characters_images[character_name] = self.textures.characters[character_name]
+
+        self.main_character_image = self.textures.characters[self.main_character]
+
+
+        self.background = W.Image(textures.locations[self.location][0], xoy)
+
+        self.text_box = W.Figure([xoy[0], xoy[1] + xoy[1] // 2], (255, 255, 255, 255),
+                                 form=[[xoy[0], xoy[1] // 2], [xoy[0], -xoy[1] // 2], [-xoy[0], -xoy[1] // 2], [-xoy[0], xoy[1] // 2]])
+
+        self.text = W.Label(self.dialog, (xoy[0] * 2 * 0.05, xoy[1]), 80, centric=False)
+
+        self.elements = [self.background, self.text_box, self.text]
+
+        self.surface = W.Surface(*self.elements)
+
+
+
+# how to get image: image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
