@@ -38,12 +38,13 @@ class OpenAIWrapper:
         Raises:
             Exception: If a valid response is not obtained within max_retries attempts
         """
-        pattern = r"\*\*Characters_names:\s*.*\n\*\*Location:\s*.*\n\*\*Main_character:\s*.*\n\*\*Dialog:\s*.*\n"
+        pattern1 = r"\*\*Characters_names:\s*.*\n*\*\*Location:\s*.*\n*\*\*Main_character:\s*.*\n*\*\*Dialog:\s*.*\n*"
+        pattern2 = r"Characters_names:\s*.*\n*Location:\s*.*\n*Main_character:\s*.*\n*Dialog:\s*.*\n"
 
         for attempt in range(max_retries):
             try:
                 response = self._get_ai_response(text_for_ai)
-                if self._validate_response(response, pattern):
+                if self._validate_response(response, pattern1) or self._validate_response(response, pattern2):
                     return response
                 print(f"Attempt {attempt + 1}: Response did not match the pattern, retrying...")
             except Exception as e:
@@ -72,13 +73,38 @@ class OpenAIWrapper:
 # Example usage:
 if __name__ == "__main__":
     ai_client = OpenAIWrapper()
-    
+    characters = [item[:-4] for item in os.listdir("Assets/Characters")]
+    locations = [item[:-4] for item in os.listdir("Assets/Locations")]
+    s = f"""Создай короткую историю на русском в соответствии с этим шаблоном, выбрав случайных персонажней, не давая им имен, и локацию (не меняй шаблон и подписывай говорящих в диалоге):
+            Characters_names: {', '.join(characters)}
+            Location: {', '.join(locations)}
+            Main_character:
+            Dialog:"""
     try:
-        response = ai_client.request_to_ai("""Создай короткую историю в соответствии с этим шаблоном:
-        Characters_names:
-        Location:
-        Main_character:
-        Dialog:""")
+        response = ai_client.request_to_ai(s)
         print(response)
     except Exception as e:
         print(f"Failed to get a valid response: {e}")
+
+''' Пример ответа:
+Characters_names: character6, character12, character18, character3, character17  
+Location: InsideARichCasino  
+Main_character: character6  
+Dialog:
+
+В роскошном казино, где свет мерцал от игральных автоматов и звенели монеты, character6 разглядывал залы в поисках удачи.
+
+character12: (наклоняясь ближе) "Сегодня вечер особый, не находишь? Кажется, фортуна на твоей стороне."
+
+character6: (улыбаясь) "Если бы ты знал, как давно я этого жду. Может быть, сегодня всё изменится."
+
+character18: (наблюдая за игрой) "Опасно доверять везению настолько. Главное, оставаться расчётливым."
+
+character3: (мимоходом устраиваясь за соседним столиком) "Ты всегда питаешь оптимизм, character6. Это похвально."
+
+character17: (подмигивая) "Ведь именно оптимизм когда-то завоевал весь этот мир, не так ли?"
+
+character6: "Уверен, что сегодня удача благоволит мне. А если нет, то хотя бы мы хорошо проведем время."
+
+И с этими словами character6 вновь сделал ставку, надеясь, что следующая карта принесёт ему долгожданный выигрыш.
+'''
