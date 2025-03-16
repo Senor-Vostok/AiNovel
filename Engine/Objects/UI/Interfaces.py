@@ -187,17 +187,25 @@ class DialogueUI:
         self.dialog = cue.get("Dialog")
         self.textures = textures
 
-        other_characters_images = dict()
-        for character_name in self.character_names:
-            other_characters_images[character_name] = self.textures.characters[character_name][0]
-
         main_character_image = self.textures.characters[self.main_character][0]
         print(self.main_character)
 
         left_margin = xoy[0] * 2 * 0.05
         right_margin = xoy[0] * 2 * 0.95
-        half_character_size = main_character_image.get_rect()[2] // 2
-        characters_vertical_position = xoy[1] - half_character_size
+        half_main_character_size = main_character_image.get_rect()[2] // 2
+        main_character_vertical_position = xoy[1] - half_main_character_size
+        half_other_characters_size = None
+
+        other_characters_images = dict()
+        for character_name in self.character_names:
+            other_char_image = self.textures.characters[character_name][0]
+            scale = 0.5
+            other_char_image = self.textures.post_render(other_char_image,
+                               (other_char_image.get_rect()[2] * scale, other_char_image.get_rect()[3] * scale))
+            other_characters_images[character_name] = other_char_image
+
+            if half_other_characters_size is None:
+                half_other_characters_size = other_char_image.get_rect()[3] // 2
 
         self.background = W.Image(textures.locations[self.location][0], xoy)
 
@@ -207,16 +215,18 @@ class DialogueUI:
 
         self.text = W.Label(self.dialog, (left_margin, xoy[1]), 80, centric=False)
 
-        self.main_character_image_widget = W.Image(main_character_image, (left_margin + half_character_size, characters_vertical_position))
+        self.main_character_image_widget = W.Image(main_character_image, (left_margin + half_main_character_size, main_character_vertical_position))
 
 
         self.elements = [self.background, self.text_box, self.text, self.main_character_image_widget]
 
-        other_character_horizontal_position = right_margin - half_character_size
+        other_character_horizontal_position = right_margin - half_other_characters_size
+        other_character_vertical_position = xoy[1] - half_other_characters_size
+
         print(right_margin)
         for char_image in other_characters_images.values():
-            self.elements.append(W.Image(char_image, (other_character_horizontal_position, characters_vertical_position)))
-            other_character_horizontal_position -= half_character_size * 2
+            self.elements.append(W.Image(char_image, (other_character_horizontal_position, other_character_vertical_position)))
+            other_character_horizontal_position -= half_other_characters_size * 2
 
         self.surface = W.Surface(*self.elements)
 
