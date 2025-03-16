@@ -187,24 +187,37 @@ class DialogueUI:
         self.dialog = cue.get("Dialog")
         self.textures = textures
 
-        self.other_characters_images = dict()
+        other_characters_images = dict()
         for character_name in self.character_names:
-            self.other_characters_images[character_name] = self.textures.characters[character_name]
+            other_characters_images[character_name] = self.textures.characters[character_name][0]
 
-        self.main_character_image = self.textures.characters[self.main_character]
+        main_character_image = self.textures.characters[self.main_character][0]
+        print(self.main_character)
 
+        left_margin = xoy[0] * 2 * 0.05
+        right_margin = xoy[0] * 2 * 0.95
+        half_character_size = main_character_image.get_rect()[2] // 2
+        characters_vertical_position = xoy[1] - half_character_size
 
         self.background = W.Image(textures.locations[self.location][0], xoy)
 
         self.text_box = W.Figure([xoy[0], xoy[1] + xoy[1] // 2], (255, 255, 255, 255),
                                  form=[[xoy[0], xoy[1] // 2], [xoy[0], -xoy[1] // 2], [-xoy[0], -xoy[1] // 2], [-xoy[0], xoy[1] // 2]])
 
-        self.text = W.Label(self.dialog, (xoy[0] * 2 * 0.05, xoy[1]), 80, centric=False)
 
-        self.elements = [self.background, self.text_box, self.text]
+        self.text = W.Label(self.dialog, (left_margin, xoy[1]), 80, centric=False)
+
+        self.main_character_image_widget = W.Image(main_character_image, (left_margin + half_character_size, characters_vertical_position))
+
+
+        self.elements = [self.background, self.text_box, self.text, self.main_character_image_widget]
+
+        other_character_horizontal_position = right_margin - half_character_size
+        print(right_margin)
+        for char_image in other_characters_images.values():
+            self.elements.append(W.Image(char_image, (other_character_horizontal_position, characters_vertical_position)))
+            other_character_horizontal_position -= half_character_size * 2
 
         self.surface = W.Surface(*self.elements)
-
-
 
 # how to get image: image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]

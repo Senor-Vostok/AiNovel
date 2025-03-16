@@ -11,4 +11,4 @@ def show_UI(handler, centre):
         "Main_character": "character10",
         "Dialog": "blah blah blah"
     }
-    handler.interfaces['dialogue_ui'] = Interfaces.DialogueUI(None, centre, handler.textures cue)
+    handler.interfaces['dialogue_ui'] = Interfaces.DialogueUI(None, centre, handler.textures, cue)
