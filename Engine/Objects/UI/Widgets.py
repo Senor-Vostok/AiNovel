@@ -258,20 +258,25 @@ class Surface:
 
 
 class Label(pygame.sprite.Sprite):
-    def __init__(self, text, xoy, pp, board_size, color=DEFAULT_COLOR, centric=True):
+    def __init__(self, text, xoy, pp, board_size, lines=1, color=DEFAULT_COLOR, centric=True):
         pygame.sprite.Sprite.__init__(self)
         self.color = color
         self.size = pp
         self.board_size = board_size
+        self.lines = lines  # Количество строк
         self.font = pygame.font.Font("19363.ttf", pp)
+
         wrapped_text = textwrap.fill(text, width=self.board_size)
         self.label = [self.font.render(line, True, color) for line in wrapped_text.split("\n")]
+
+        # Высота rect зависит от количества строк
         self.rect = self.label[0].get_rect(center=xoy)
+        self.rect.height = self.size * self.lines * 1.5
         if not centric:
             self.rect.topleft = xoy
         self.scroll_offset = 0
         self.scrollbar_width = 10
-        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width + 10, 0,
+        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width + 30, 0,
                                           self.scrollbar_width, self.rect.height)
         self.scrollbar_handle_height = 50
         self.scrollbar_dragging = False
@@ -279,7 +284,7 @@ class Label(pygame.sprite.Sprite):
         self.create_surface()
 
     def create_surface(self):
-        self.surface = pygame.Surface((self.rect.width + 10, self.rect.height))
+        self.surface = pygame.Surface((self.rect.width + 30, self.rect.height))
         self.surface.fill(BACKGROUND_COLOR)
         pygame.draw.rect(self.surface, BACKGROUND_COLOR, self.rect)
 
@@ -287,13 +292,16 @@ class Label(pygame.sprite.Sprite):
         wrapped_text = textwrap.fill(text, width=self.board_size)
         self.label = [self.font.render(line, True, self.color) for line in wrapped_text.split("\n")]
 
+        self.rect.height = self.size * self.lines * 1.5
+
     def draw(self, screen):
         self.surface.fill(BACKGROUND_COLOR)
-        y_offset = -self.scroll_offset
 
-        for idx, line in enumerate(self.label):
+        y_offset = -self.scroll_offset
+        for idx, line in enumerate(self.label[:self.lines]):
             self.surface.blit(line, (0, y_offset))
             y_offset += self.size * 1.5
+
         total_text_height = len(self.label) * self.size * 1.5
         if total_text_height > self.rect.height:
             scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
@@ -321,7 +329,6 @@ class Label(pygame.sprite.Sprite):
             scrollbar_handle_y = mouse_pos[1] - self.rect.y
             self.scroll_offset = (scrollbar_handle_y / self.rect.height) * total_text_height
             self.scroll_offset = max(0, min(self.scroll_offset, total_text_height - self.rect.height))
-
 
 class Image(pygame.sprite.Sprite):
     def __init__(self, image, xoy):

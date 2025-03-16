@@ -213,7 +213,7 @@ class DialogueUI:
                                  form=[[xoy[0], xoy[1] // 2], [xoy[0], -xoy[1] // 2], [-xoy[0], -xoy[1] // 2], [-xoy[0], xoy[1] // 2]])
 
 
-        self.text = W.Label(self.dialog, (left_margin, xoy[1]), 50, board_size=60, centric=False)
+        self.text = W.Label(self.dialog, (left_margin, xoy[1]), 50, board_size=60, lines = 7, centric=False)
 
         self.main_character_image_widget = W.Image(main_character_image, (left_margin + half_main_character_size, main_character_vertical_position))
 
