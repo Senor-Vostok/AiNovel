@@ -7,7 +7,7 @@ screen_height = None
 
 class Test:
     def __init__(self, language_data, xoy, textures):
-        self.hello = W.Label("Hello Team 1 :))", (xoy[0], xoy[1] + 100), 80, (255, 255, 255))
+        self.hello = W.Label("Hello Team 1 :))", (xoy[0], xoy[1] + 100), 80, 100,(255, 255, 255))
 
         self.image = W.Image(textures.characters["character19"][0], (xoy[0], xoy[1] - 200))
 
@@ -109,16 +109,16 @@ class NewStoryCreationScreen:
 
         self.title = W.Label(text="Новая история",
                              xoy=(left_column_horizontal_position, self.screen_height * 0.1),
-                             pp=80, color=(0, 0, 0), centric=False)
+                             pp=80, board_size=100, color=(0, 0, 0), centric=False)
 
         self.genre_label = W.Label(text="Жанр",
                                    xoy=(left_column_horizontal_position, self.screen_height * 0.2),
-                                   pp=80, color=(0, 0, 0), centric=False)
+                                   pp=80, board_size= 100, color=(0, 0, 0), centric=False)
 
         actors_vertical_position = self.screen_height * 0.3
         self.actors_label = W.Label(text="Действующие лица",
                                     xoy=(left_column_horizontal_position, actors_vertical_position),
-                                    pp=80, color=(0, 0, 0), centric=False)
+                                    pp=80, board_size=100, color=(0, 0, 0), centric=False)
 
         add_actors_plus_symbol_line_half_length = 20
         add_actors_plus_symbol_line_half_width = 2
@@ -151,7 +151,7 @@ class NewStoryCreationScreen:
 
         self.desctiption_label = W.Label(text="Описание или вступление:",
                                          xoy=(left_column_horizontal_position, self.screen_height * 0.45),
-                                         pp=80, color=(0, 0, 0), centric=False)
+                                         pp=80, board_size=100, color=(0, 0, 0), centric=False)
 
         description_field_position = (xoy[0], self.screen_height * 0.7)
         description_field_height = self.screen_height * 0.3
@@ -213,7 +213,7 @@ class DialogueUI:
                                  form=[[xoy[0], xoy[1] // 2], [xoy[0], -xoy[1] // 2], [-xoy[0], -xoy[1] // 2], [-xoy[0], xoy[1] // 2]])
 
 
-        self.text = W.Label(self.dialog, (left_margin, xoy[1]), 80, centric=False)
+        self.text = W.Label(self.dialog, (left_margin, xoy[1]), 50, board_size=60, centric=False)
 
         self.main_character_image_widget = W.Image(main_character_image, (left_margin + half_main_character_size, main_character_vertical_position))
 
