@@ -5,36 +5,13 @@ screen_width = None
 screen_height = None
 
 
-class Test:
-    def __init__(self, language_data, xoy, textures):
-        self.hello = W.Label("Hello Team 1 :))", (xoy[0], xoy[1] + 100), 80, (255, 255, 255))
-
-        self.image = W.Image(textures.characters["character19"][0], (xoy[0], xoy[1] - 200))
-
-        self.figure = W.Figure([xoy[0], xoy[1] - 100], (48, 35, 22, 255),
-                             form=[[100, 30], [30, 100], [100, 100], [30, 30], [100, 30]], thickness=2,
-                             color_bord=(252, 0, 0, 255))
-
-        self.circle = W.Circle([xoy[0], xoy[1] + 200], (48, 35, 22, 255), radius=100, thickness=2,
-                             color_bord=(252, 0, 0, 0))
-        self.dropdown = W.DropDown(textures.DropDown["selected"] + textures.DropDown["arrow"] + textures.DropDown["variant"], (xoy[0], xoy[1] + 200), ("1", "2", "3", "4", "5"))
-        self.background = W.Image(textures.locations["InsideTheCircusTent"][0], xoy)
-        self.surface = W.Surface(self.background, self.image, self.hello, self.figure, self.dropdown)
-
-
-class Entry:
-    def __init__(self, text, func=None):
-        self.text = text
-        self.function = func
-
-
 class MainMenu:
     def __init__(self, language_data, xoy, textures, saves_story):
         self.textures = textures
         self.screen_width = xoy[0] * 2
         self.screen_height = xoy[1] * 2
-        self.entries = [Entry(story["name"], story["launch"]) for story in saves_story]
-        self.entries.append(Entry("Новая история"))
+        self.entries = [W.Entry(story["name"], story["launch"]) for story in saves_story]
+        self.entries.append(W.Entry("New story", None))
         self.surface = W.Surface()
         self.base_widget_kit = []
         self.button_state_color = (0, 0, 0, 0)
@@ -47,7 +24,7 @@ class MainMenu:
         self.HORIZONTAL_PERCENT_FILLING = 0.5
 
         image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
-        self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
+        image = self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
         xoy_image = (image.get_rect()[2] / 2 + 10 * self.textures.resizer, self.screen_height - image.get_rect()[3] / 2 - 10 * self.textures.resizer)
         self.base_widget_kit.append(W.Image(image, xoy_image))
         self.update_displayed_entries()

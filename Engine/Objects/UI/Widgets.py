@@ -146,14 +146,14 @@ class InteractLabel(pygame.sprite.Sprite):
 
     def create_surface(self):
         self.surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
-        self.surface.fill((233, 217, 202, 0))
+        self.surface.fill((0, 0, 0, 0))
         self.fill_surface()
 
     def fill_surface(self):
-        pygame.draw.rect(self.surface, (233, 217, 202, 0), self.rect)
+        pygame.draw.rect(self.surface, (0, 0, 0, 0), self.rect)
 
     def draw(self, screen):
-        self.surface.fill((233, 217, 202, 0))
+        self.surface.fill((0, 0, 0, 0))
         y_offset = -self.scroll_offset
         for idx, line in enumerate(self.text):
             text_surface = self.font.render(line, False, (0, 0, 0))
@@ -438,6 +438,7 @@ class Circle(pygame.sprite.Sprite):
 
     def update(self, mouse_click, command):
         pass
+
 
 class Entry:
     def __init__(self, text: str, function=None):

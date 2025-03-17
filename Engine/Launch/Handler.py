@@ -41,17 +41,16 @@ class EventHandler:
         self.effects = list()  # Хранит объекты класса Effects
         self.camera = MainCamera()
         self.render = Render(self)
-        self.saves_story = [{"name": "История бобра Максима", "launch": None},
-                            {"name": "История бобра Максима", "launch": None},
-                            {"name": "История бобра Максима", "launch": None},
-                            {"name": "История бобра Максима", "launch": None},
-                            {"name": "История бобра Максима", "launch": None}]
-        show_UI(self, self.center)
+        self.saves_story = []
+        showMainMenu(self, self.center)
         # handler.__xoy_information = [handler.centre[0] * 2, handler.centre[1] * 2 - handler.textures.land['barrier'][0].get_rect()[2]]
 
     # def change_volume(handler, slicer, channel):
     #     handler.volumes_channels[channel] = slicer.now_sector / slicer.cuts  # Проценты
     #     pygame.mixer.Channel(channel).set_volume(handler.volumes_channels[channel])
+
+    def createNewStory(self):
+        pass
 
     def click_handler(self):
         command = None
