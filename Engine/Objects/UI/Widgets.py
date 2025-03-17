@@ -266,9 +266,10 @@ class Label(pygame.sprite.Sprite):
         self.lines = lines
         self.scrollbar_width = 10
         self.font = pygame.font.Font("19363.ttf", pp)
+        self.count = 0
 
         self.label = self.wrap_text(text)
-        self.rect = self.label[0].get_rect(center=xoy)
+        self.rect = self.font.render(self.label[0], True, self.color).get_rect(center=xoy)
         self.rect.height = self.size * self.lines * 1.5
         if not centric:
             self.rect.topleft = xoy
@@ -289,26 +290,26 @@ class Label(pygame.sprite.Sprite):
     def wrap_text(self, text):
         lines = []
         test_line = ''
-        for word in text:
-            test_line += word
+        print(text)
+        i = 0
+        for j in range(len(text)):
+            test_line += text[j]
             if self.font.size(test_line)[0] > (self.board_size - self.scrollbar_width - 10):
-                lines.append(self.font.render(test_line, True, self.color))
+                lines.append(test_line)
+                print(test_line)
                 test_line = ''
+                i += 1
         if test_line:
-            lines.append(self.font.render(test_line, True, self.color))
+            lines.append(test_line)
 
         return lines
-
-    def new_text(self, text):
-        self.label = self.wrap_text(text)
-        self.rect.height = self.size * self.lines * 1.5
 
     def draw(self, screen):
         self.surface.fill(BACKGROUND_COLOR)
 
         y_offset = -self.scroll_offset
-        for idx, line in enumerate(self.label[:self.lines]):
-            self.surface.blit(line, (0, y_offset))
+        for idx, line in enumerate(self.label):
+            self.surface.blit(self.font.render(line, True, self.color), (0, y_offset))
             y_offset += self.size * 1.5
 
         total_text_height = len(self.label) * self.size * 1.5
