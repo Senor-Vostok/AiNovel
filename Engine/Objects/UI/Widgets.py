@@ -5,6 +5,7 @@ from datetime import datetime
 import Engine.Constants
 from Engine.Constants import DEFAULT_COLOR, BACKGROUND_COLOR
 from Engine.Sound.Sounds import Sounds
+import textwrap
 from win32api import GetSystemMetrics
 
 sounds = Sounds()
@@ -256,48 +257,60 @@ class Surface:
             i.draw(screen)
 
 
-class Label(pygame.sprite.Sprite): # если хотите переносить на другую строчку нужно в тексте указывать \n сам класс не определяет момент переноса
-    def __init__(self, text, xoy, pp, color=DEFAULT_COLOR, centric=True):
+class Label(pygame.sprite.Sprite):
+    def __init__(self, text, xoy, pp, board_size, lines=1, color=DEFAULT_COLOR, centric=True):
         pygame.sprite.Sprite.__init__(self)
-        text = str(text)
         self.color = color
-        self.text = text
         self.size = pp
-        self.font = pygame.font.Font("19363.ttf", pp)
-        self.label = []
-        self.current_label = 0
-        for text in self.text.split('\n'):
-            self.label.append(self.font.render(text, 1, color))
-        self.rect = self.label[0].get_rect(center=xoy)
-        if not centric:
-            self.rect.x, self.rect.y = xoy
-        self.scroll_offset = 0
+        self.board_size = board_size
+        self.lines = lines
         self.scrollbar_width = 10
-        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width + 10, 0, self.scrollbar_width,
-                                          self.rect.height)
+        self.font = pygame.font.Font("19363.ttf", pp)
+
+        self.label = self.wrap_text(text)
+        self.rect = self.label[0].get_rect(center=xoy)
+        self.rect.height = self.size * self.lines * 1.5
+        if not centric:
+            self.rect.topleft = xoy
+
+        self.scroll_offset = 0
+        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width + 30, 0,
+                                          self.scrollbar_width, self.rect.height)
         self.scrollbar_handle_height = 50
         self.scrollbar_dragging = False
         self.surface = None
         self.create_surface()
 
     def create_surface(self):
-        self.surface = pygame.Surface((self.rect.width + 10, self.rect.height))
+        self.surface = pygame.Surface((self.rect.width + 30, self.rect.height))
         self.surface.fill(BACKGROUND_COLOR)
         pygame.draw.rect(self.surface, BACKGROUND_COLOR, self.rect)
 
+    def wrap_text(self, text):
+        lines = []
+        test_line = ''
+        for word in text:
+            test_line += word
+            if self.font.size(test_line)[0] > (self.board_size - self.scrollbar_width - 10):
+                lines.append(self.font.render(test_line, True, self.color))
+                test_line = ''
+        if test_line:
+            lines.append(self.font.render(test_line, True, self.color))
+
+        return lines
+
     def new_text(self, text):
-        text = str(text)
-        self.label.clear()
-        for text in text.split('\n'):
-            self.label.append(self.font.render(text, 1, self.color))
+        self.label = self.wrap_text(text)
+        self.rect.height = self.size * self.lines * 1.5
 
     def draw(self, screen):
         self.surface.fill(BACKGROUND_COLOR)
-        y_offset = -self.scroll_offset
 
-        for idx, line in enumerate(self.label):
+        y_offset = -self.scroll_offset
+        for idx, line in enumerate(self.label[:self.lines]):
             self.surface.blit(line, (0, y_offset))
             y_offset += self.size * 1.5
+
         total_text_height = len(self.label) * self.size * 1.5
         if total_text_height > self.rect.height:
             scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
@@ -325,7 +338,6 @@ class Label(pygame.sprite.Sprite): # если хотите переносить 
             scrollbar_handle_y = mouse_pos[1] - self.rect.y
             self.scroll_offset = (scrollbar_handle_y / self.rect.height) * total_text_height
             self.scroll_offset = max(0, min(self.scroll_offset, total_text_height - self.rect.height))
-
 
 class Image(pygame.sprite.Sprite):
     def __init__(self, image, xoy):

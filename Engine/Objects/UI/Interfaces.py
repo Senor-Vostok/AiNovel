@@ -5,6 +5,31 @@ screen_width = None
 screen_height = None
 
 
+
+class Test:
+    def __init__(self, language_data, xoy, textures):
+        self.hello = W.Label("Hello Team 1 :))", (xoy[0], xoy[1] + 100), 80, 100,(255, 255, 255))
+
+        self.image = W.Image(textures.characters["character19"][0], (xoy[0], xoy[1] - 200))
+
+        self.figure = W.Figure([xoy[0], xoy[1] - 100], (48, 35, 22, 255),
+                             form=[[100, 30], [30, 100], [100, 100], [30, 30], [100, 30]], thickness=2,
+                             color_bord=(252, 0, 0, 255))
+
+        self.circle = W.Circle([xoy[0], xoy[1] + 200], (48, 35, 22, 255), radius=100, thickness=2,
+                             color_bord=(252, 0, 0, 0))
+        self.dropdown = W.DropDown(textures.DropDown["selected"] + textures.DropDown["arrow"] + textures.DropDown["variant"], (xoy[0], xoy[1] + 200), ("1", "2", "3", "4", "5"))
+        self.background = W.Image(textures.locations["InsideTheCircusTent"][0], xoy)
+        self.surface = W.Surface(self.background, self.image, self.hello, self.figure, self.dropdown)
+
+
+class Entry:
+    def __init__(self, text, func=None):
+        self.text = text
+        self.function = func
+
+
+
 class MainMenu:
     def __init__(self, language_data, xoy, textures, saves_story):
         self.textures = textures
@@ -20,8 +45,8 @@ class MainMenu:
         print(f"Screen Dimensions: {screen_width}×{screen_height}")
 
         # Константы заполнения интерфейса
-        self.VERTICAL_PERCENT_FILLING = 0.5
-        self.HORIZONTAL_PERCENT_FILLING = 0.5
+        self.VERTICAL_PERCENT_FILLING = 0.8
+        self.HORIZONTAL_PERCENT_FILLING = 0.8
 
         image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
         image = self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
@@ -86,16 +111,16 @@ class NewStoryCreationScreen:
 
         self.title = W.Label(text="Новая история",
                              xoy=(left_column_horizontal_position, self.screen_height * 0.1),
-                             pp=80, color=(0, 0, 0), centric=False)
+                             pp=80, board_size=100, color=(0, 0, 0), centric=False)
 
         self.genre_label = W.Label(text="Жанр",
                                    xoy=(left_column_horizontal_position, self.screen_height * 0.2),
-                                   pp=80, color=(0, 0, 0), centric=False)
+                                   pp=80, board_size= 100, color=(0, 0, 0), centric=False)
 
         actors_vertical_position = self.screen_height * 0.3
         self.actors_label = W.Label(text="Действующие лица",
                                     xoy=(left_column_horizontal_position, actors_vertical_position),
-                                    pp=80, color=(0, 0, 0), centric=False)
+                                    pp=80, board_size=100, color=(0, 0, 0), centric=False)
 
         add_actors_plus_symbol_line_half_length = 20
         add_actors_plus_symbol_line_half_width = 2
@@ -128,7 +153,7 @@ class NewStoryCreationScreen:
 
         self.desctiption_label = W.Label(text="Описание или вступление:",
                                          xoy=(left_column_horizontal_position, self.screen_height * 0.45),
-                                         pp=80, color=(0, 0, 0), centric=False)
+                                         pp=80, board_size=100, color=(0, 0, 0), centric=False)
 
         description_field_position = (xoy[0], self.screen_height * 0.7)
         description_field_height = self.screen_height * 0.3
@@ -154,3 +179,57 @@ class NewStoryCreationScreen:
         self.elements = [self.title, self.genre_label, self.actors_label, self.desctiption_label, self.description_field_figure] + self.add_actors_plus_symbol
 
         self.surface = W.Surface(*self.elements)
+
+
+class DialogueUI:
+    def __init__(self, language_data, xoy, textures, cue):
+        self.character_names = cue.get("Characters_names")
+        self.location = cue.get("Location")
+        self.main_character = cue.get("Main_character")
+        self.dialog = cue.get("Dialog")
+        self.textures = textures
+
+        main_character_image = self.textures.characters[self.main_character][0]
+        print(self.main_character)
+
+        left_margin = xoy[0] * 2 * 0.05
+        right_margin = xoy[0] * 2 * 0.95
+        half_main_character_size = main_character_image.get_rect()[2] // 2
+        main_character_vertical_position = xoy[1] - half_main_character_size
+        half_other_characters_size = None
+
+        other_characters_images = dict()
+        for character_name in self.character_names:
+            other_char_image = self.textures.characters[character_name][0]
+            scale = 0.5
+            other_char_image = self.textures.post_render(other_char_image,
+                               (other_char_image.get_rect()[2] * scale, other_char_image.get_rect()[3] * scale))
+            other_characters_images[character_name] = other_char_image
+
+            if half_other_characters_size is None:
+                half_other_characters_size = other_char_image.get_rect()[3] // 2
+
+        self.background = W.Image(textures.locations[self.location][0], xoy)
+
+        self.text_box = W.Figure([xoy[0], xoy[1] + xoy[1] // 2], (255, 255, 255, 255),
+                                 form=[[xoy[0], xoy[1] // 2], [xoy[0], -xoy[1] // 2], [-xoy[0], -xoy[1] // 2], [-xoy[0], xoy[1] // 2]])
+
+
+        self.text = W.Label(self.dialog, (left_margin, xoy[1]), 50, xoy[0] * 2 * 0.9, lines = 7, centric=False)
+
+        self.main_character_image_widget = W.Image(main_character_image, (left_margin + half_main_character_size, main_character_vertical_position))
+
+
+        self.elements = [self.background, self.text_box, self.text, self.main_character_image_widget]
+
+        other_character_horizontal_position = right_margin - half_other_characters_size
+        other_character_vertical_position = xoy[1] - half_other_characters_size
+
+        print(right_margin)
+        for char_image in other_characters_images.values():
+            self.elements.append(W.Image(char_image, (other_character_horizontal_position, other_character_vertical_position)))
+            other_character_horizontal_position -= half_other_characters_size * 2
+
+        self.surface = W.Surface(*self.elements)
+
+# how to get image: image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
