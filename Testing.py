@@ -11,6 +11,7 @@ from Engine.Objects.MainCamera import MainCamera
 from Engine.Visual.Render import Render
 from Engine.Visual.Efffect import *
 from Engine.Objects.UI.Widgets import *
+from aiinterface import *
 
 handler = EventHandler()
 testImage = pygame.transform.scale(pygame.image.load("Assets/UI/DropDown/arrow.png"), (10, 10)).convert_alpha()
@@ -73,6 +74,8 @@ def generate_random_arg(param: inspect.Parameter) -> Any:
             return handler.textures
         elif param.name == "handler":
             return handler
+        elif param.name == "api_key":
+            return "sk-RB5FOndF7spe9gSsHTnzrskD1pJfrDxs"
         print(f"Can`t test value:\t {param.name}")
         return None
 
@@ -126,10 +129,14 @@ test_class_methods(Sounds())
 print("Testing Objects")
 test_class_methods(MainCamera())
 print("Testing Interfaces")
-test_class_methods(Test(None, (0, 0), handler.textures))
+test_class_methods(MainMenu(None, (0, 0), handler.textures, []))
+test_class_methods(NewStoryCreationScreen(None, (0, 0), handler.textures))
 print("Testing logics")
 test_class_methods(Scene(handler))
 print("Testing Visual")
 test_class_methods(Render(handler))
 test_class_methods(Effect((0, 0), [testImage] * 5))
 test_class_methods(Information((0, 0), "test", 2, testImage))
+print("Testing AI")
+test_class_methods(OpenAIWrapper("sk-RB5FOndF7spe9gSsHTnzrskD1pJfrDxs"))
+

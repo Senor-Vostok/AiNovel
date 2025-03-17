@@ -5,6 +5,7 @@ screen_width = None
 screen_height = None
 
 
+
 class Test:
     def __init__(self, language_data, xoy, textures):
         self.hello = W.Label("Hello Team 1 :))", (xoy[0], xoy[1] + 100), 80, 100,(255, 255, 255))
@@ -28,13 +29,14 @@ class Entry:
         self.function = func
 
 
+
 class MainMenu:
     def __init__(self, language_data, xoy, textures, saves_story):
         self.textures = textures
         self.screen_width = xoy[0] * 2
         self.screen_height = xoy[1] * 2
-        self.entries = [Entry(story["name"], story["launch"]) for story in saves_story]
-        self.entries.append(Entry("Новая история"))
+        self.entries = [W.Entry(story["name"], story["launch"]) for story in saves_story]
+        self.entries.append(W.Entry("New story", None))
         self.surface = W.Surface()
         self.base_widget_kit = []
         self.button_state_color = (0, 0, 0, 0)
@@ -47,7 +49,7 @@ class MainMenu:
         self.HORIZONTAL_PERCENT_FILLING = 0.8
 
         image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
-        self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
+        image = self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
         xoy_image = (image.get_rect()[2] / 2 + 10 * self.textures.resizer, self.screen_height - image.get_rect()[3] / 2 - 10 * self.textures.resizer)
         self.base_widget_kit.append(W.Image(image, xoy_image))
         self.update_displayed_entries()
