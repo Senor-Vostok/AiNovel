@@ -50,7 +50,8 @@ class EventHandler:
     #     pygame.mixer.Channel(channel).set_volume(handler.volumes_channels[channel])
 
     def createNewStory(self):
-        pass
+        self.interfaces.clear()
+        showDialog(self, self.center)
 
     def click_handler(self):
         command = None
