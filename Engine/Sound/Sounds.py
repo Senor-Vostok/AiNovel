@@ -1,4 +1,5 @@
 import pygame
+import os
 
 pygame.init()
 pygame.mixer.init()
@@ -8,7 +9,7 @@ pygame.mixer.set_num_channels(10)
 class Sounds:
     def __init__(self):
         self.loaded_sound = dict()
-        # self.click = self.__load_sound(f'data/sounds/click.mp3') example
+        self.musics = [self.__load_sound(f"Assets/music/{file}") for file in os.listdir("Assets/music")]
 
     def __load_sound(self, file):
         try:

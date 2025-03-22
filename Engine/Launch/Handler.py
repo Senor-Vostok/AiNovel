@@ -1,5 +1,4 @@
-import copy
-import sys
+import random
 import os
 import shutil
 import tkinter as tk
@@ -29,8 +28,9 @@ class EventHandler:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(self.size, pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.RESIZABLE)
         self.textures = Textures()
-        # handler.screen.blit(handler.textures.loading, (handler.centre[0] - handler.textures.loading.get_rect()[2] // 2, handler.centre[1] - handler.textures.loading.get_rect()[3] // 2))
-        # pygame.display.flip()
+        self.screen.blit(self.textures.loading, (self.center[0] - self.textures.loading.get_rect()[2] // 2, self.center[1] - self.textures.loading.get_rect()[3] // 2))
+        pygame.display.flip()
+        self.textures.init_textures()
         self.sounds = Sounds()
         # pygame.mouse.set_visible(False)
         # pygame.mixer.Channel(0).play(handler.sounds.menu, -1)
@@ -50,6 +50,7 @@ class EventHandler:
     #     pygame.mixer.Channel(channel).set_volume(handler.volumes_channels[channel])
 
     def createNewStory(self):
+        pygame.mixer.Channel(0).play(random.choice(self.sounds.musics), -1)
         self.interfaces.clear()
         showDialog(self, self.center)
 

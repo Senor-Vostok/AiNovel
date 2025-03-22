@@ -37,75 +37,41 @@ class MainMenu:
         self.screen_width = xoy[0] * 2
         self.screen_height = xoy[1] * 2
         self.entries = [W.Entry(story["name"], story["launch"]) for story in saves_story]
-        self.entries.append(W.Entry("New story", new_story))
         self.surface = W.Surface()
-        self.base_widget_kit = []
-        self.button_state_color = (0, 0, 0, 0)
-        self.button_trigger_color = (196, 73, 0, 255)
 
-        print(f"Screen Dimensions: {screen_width}×{screen_height}")
+        location = self.textures.locations[random.choice(list(self.textures.locations.keys()))][0]
+        self.surface.widgets.append(W.Image(location, xoy))
 
-        # Константы заполнения интерфейса
-        self.VERTICAL_PERCENT_FILLING = 0.8
-        self.HORIZONTAL_PERCENT_FILLING = 0.8
+        character = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
+        character = self.textures.post_render(character, (character.get_rect()[2] * 1.8, character.get_rect()[3] * 1.8))
+        xoy_image = ((self.screen_width - character.get_rect()[2] / 2 - 10) * self.textures.resizer, (self.screen_height - character.get_rect()[3] / 2) * self.textures.resizer)
+        self.surface.widgets.append(W.Image(character, xoy_image))
 
-        image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
-        image = self.textures.post_render(image, (image.get_rect()[2] * 0.7, image.get_rect()[3] * 0.7))
-        xoy_image = (image.get_rect()[2] / 2 + 10 * self.textures.resizer,
-                     self.screen_height - image.get_rect()[3] / 2 - 10 * self.textures.resizer)
-        self.base_widget_kit.append(W.Image(image, xoy_image))
-        self.update_displayed_entries()
+        # back = self.textures.back
+        # self.surface.widgets.append(W.Image(back, xoy))
 
-    def update_displayed_entries(self):
-        self.surface.widgets = self.base_widget_kit
-        cell_height = self.cell_height()
-        print("Cell height: ", cell_height)
-        vertical_position = (self.screen_height * (1 - self.VERTICAL_PERCENT_FILLING)) / 2 + cell_height * 2
-        horizontal_position = self.screen_width // 2
-        for entry in self.entries:
-            print(vertical_position)
-            button_trigger_figure, button_state_figure = self.create_button_figures(
-                (horizontal_position, vertical_position), entry.text, self.button_trigger_color,
-                max_height=cell_height * 2)
-            entry_button = W.Button(xoy=(horizontal_position, vertical_position),
-                                    images=[button_state_figure.surface, button_trigger_figure.surface],
-                                    text=entry.text)
-            if entry.function is not None:
-                entry_button.connect(entry.function)
-            self.surface.widgets.append(entry_button)
-            vertical_position += cell_height * 3
+        img = self.textures.buttonBigButton[0]
+        xoy_image = ((img.get_rect()[2] / 2 + 200) * self.textures.resizer, (img.get_rect()[3] / 2 + 100) * self.textures.resizer)
+        self.NewStory = W.Button(self.textures.buttonBigButton, xoy_image, text="New Story", colors=[(10, 52, 35), (83, 38, 8)])
+        self.LastStory = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 1.2), text="Continue", colors=[(10, 52, 35), (83, 38, 8)])
+        self.LoadStory = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 2.4), text="Load", colors=[(10, 52, 35), (83, 38, 8)])
+        self.Settings = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 3.6), text="Settings", colors=[(10, 52, 35), (83, 38, 8)])
+        self.AI = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 4.8), text="Connect AI", colors=[(10, 52, 35), (83, 38, 8)])
+        self.Custom = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 6), text="My sprites", colors=[(10, 52, 35), (83, 38, 8)])
+        self.Quite = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 7.2), text="Quite", colors=[(10, 52, 35), (83, 38, 8)])
+        self.NewStory.connect(new_story)
+        self.surface.widgets.append(self.NewStory)
+        self.surface.widgets.append(self.LastStory)
+        self.surface.widgets.append(self.LoadStory)
+        self.surface.widgets.append(self.Settings)
+        self.surface.widgets.append(self.AI)
+        self.surface.widgets.append(self.Custom)
+        self.surface.widgets.append(self.Quite)
 
-    def cell_height(self) -> int:
-        global screen_height
-        global screen_width
-        amount_of_entries = len(self.entries)
-        amount_of_cells = amount_of_entries * 2 + amount_of_entries + 1
-        return int((self.screen_height * self.VERTICAL_PERCENT_FILLING) // amount_of_cells)
-
-    def create_button_figures(self, position, button_text: str, color: tuple[...], max_height) -> tuple[
-        W.Figure, W.Figure]:
-        max_height = self.cell_height() if not max_height else max_height
-        max_vertical_distance = max_height // 2
-        horizontal_safe_zone_size = int(self.screen_width - (0.1 * self.screen_width)) // 2
-        # Создание псевдо текста и его длины
-        font = pygame.font.Font("19363.ttf", max_height - max_height // 3)
-        LabelText = font.render(button_text, 1, (0, 0, 0)).get_rect()[2]
-        #
-        max_horizontal_distance = min(LabelText, horizontal_safe_zone_size)
-        vertical_distance = lambda: random.randint(int(max_vertical_distance - (0.1 * max_vertical_distance)),
-                                                   max_vertical_distance)
-        horizontal_distance = lambda: random.randint(int(max_horizontal_distance - (0.1 * max_horizontal_distance)),
-                                                     max_horizontal_distance)
-        bottom_left = [-horizontal_distance(), -vertical_distance()]
-        top_left = [-horizontal_distance(), vertical_distance()]
-        top_right = [horizontal_distance(), vertical_distance()]
-        bottom_right = [horizontal_distance(), -vertical_distance()]
-        return W.Figure(xoy=position,
-                        color=color,
-                        form=[top_left, top_right, bottom_right, bottom_left]), \
-            W.Figure(xoy=position,
-                     color=(0, 0, 0, 0,),
-                     form=[top_left, top_right, bottom_right, bottom_left])
+        img = self.textures.logo
+        xoy_image = ((self.screen_width - img.get_rect()[2] / 2) * self.textures.resizer, (img.get_rect()[3] / 2) * self.textures.resizer)
+        self.NewStory = W.Image(self.textures.logo, xoy_image)
+        self.surface.widgets.append(self.NewStory)
 
 
 class NewStoryCreationScreen:
@@ -223,8 +189,8 @@ class DialogueUI:
         self.background = W.Image(textures.locations[self.location][0], xoy)
 
         self.text_box = W.Figure([xoy[0], xoy[1] + xoy[1] // 2], (255, 255, 255, 255),
-                                 form=[[xoy[0], xoy[1] // 2], [xoy[0], -xoy[1] // 2], [-xoy[0], -xoy[1] // 2],
-                                       [-xoy[0], xoy[1] // 2]])
+                                 form=[[xoy[0], xoy[1] // 4], [xoy[0], -xoy[1] // 4], [-xoy[0], -xoy[1] // 4],
+                                       [-xoy[0], xoy[1] // 4]])
 
         self.text = W.Label(self.dialog, (left_margin, xoy[1]), 50, xoy[0] * 2 * 0.9, lines=7, centric=False)
 

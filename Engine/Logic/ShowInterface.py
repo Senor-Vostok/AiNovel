@@ -1,5 +1,4 @@
 from Engine.Objects.UI import Interfaces
-from Engine.Objects.UI import Widgets
 
 
 def showDialog(handler, centre):
