@@ -2,9 +2,6 @@ import pygame
 from datetime import datetime
 import Engine.Constants
 from Engine.Constants import DEFAULT_COLOR, BACKGROUND_COLOR
-from Engine.Sound.Sounds import Sounds
-
-sounds = Sounds()
 
 
 class Button(pygame.sprite.Sprite):
@@ -113,20 +110,22 @@ class Slicer(pygame.sprite.Sprite):
                 self.now_sector = int((mouse_click[0] - self.rect[0]) // (self.rect[2] / self.cuts) + 1)
 
 
+import pygame
+from datetime import datetime
+
+
 class InteractLabel(pygame.sprite.Sprite):
-    def __init__(self, images, xoy, active=True, center=False):
+    def __init__(self, images, xoy, active=True, center=False, text=[''], size=None):
         pygame.sprite.Sprite.__init__(self)
         self.center = center
         self.state = images[0]
         self.flex = images[1]
         self.image = self.state
-        self.text = ['']
-        self.current_text = 0
         self.func = None
         self.args = None
         self.active = active
         self.rect = self.image.get_rect(center=xoy)
-        self.font = pygame.font.Font("19363.ttf", int(self.rect[3] * 0.3))
+        self.font = pygame.font.Font("19363.ttf", int(self.rect[3] * 0.3 if not size else size))
         self.timer = datetime.now()
         self.visible = True
         self.can_write = False
@@ -139,7 +138,27 @@ class InteractLabel(pygame.sprite.Sprite):
                                           self.rect.height)
         self.scrollbar_handle_height = 50
         self.scrollbar_dragging = False
+        self.text = self.wrap_text(text)
+        self.current_text = len(self.text) - 1
         self.create_surface()
+
+    def wrap_text(self, text_lines):
+        try:
+            wrapped_lines = []
+            for line in text_lines:
+                words = line.split()
+                new_line = ""
+                for word in words:
+                    test_line = new_line + (" " if new_line else "") + word
+                    if self.font.size(test_line)[0] < self.rect.width * 0.9:
+                        new_line = test_line
+                    else:
+                        wrapped_lines.append(new_line)
+                        new_line = word
+                wrapped_lines.append(new_line)
+            return wrapped_lines
+        except Exception as e:
+            print(e)
 
     def create_surface(self):
         self.surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
@@ -152,30 +171,18 @@ class InteractLabel(pygame.sprite.Sprite):
     def draw(self, screen):
         self.surface.fill((0, 0, 0, 0))
         y_offset = -self.scroll_offset
-        for idx, line in enumerate(self.text):
+        for line in self.text:
             text_surface = self.font.render(line, False, (0, 0, 0))
-            if text_surface.get_width() > self.rect.width * 0.9:
-                words = line.split('|')
-                new_line = ''
-                for word in words:
-                    test_line = new_line + word
-                    if self.font.size(test_line)[0] < self.rect.width * 0.9:
-                        new_line = test_line
-                    else:
-                        self.surface.blit(self.font.render(new_line, False, (0, 0, 0)), (5, y_offset))
-                        new_line = word
-                self.surface.blit(self.font.render(new_line, False, (0, 0, 0)), (5, y_offset))
-                y_offset += self.font.get_height()
-            else:
-                self.surface.blit(text_surface, (5, y_offset))
-                y_offset += self.font.get_height()
+            self.surface.blit(text_surface, (5, y_offset))
+            y_offset += self.font.get_height()
+
         total_text_height = self.font.get_height() * len(self.text)
         scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
         scrollbar_handle_height = (self.rect.height / total_text_height) * self.rect.height
         pygame.draw.rect(self.surface, (200, 200, 200), self.scrollbar_rect)
         pygame.draw.rect(self.surface, (100, 100, 100),
                          (self.scrollbar_rect.x, scrollbar_handle_y,
-                            self.scrollbar_width, scrollbar_handle_height))
+                          self.scrollbar_width, scrollbar_handle_height))
         screen.blit(self.image, (self.rect.x, self.rect.y))
         screen.blit(self.surface, (self.rect.x, self.rect.y))
 
@@ -187,8 +194,7 @@ class InteractLabel(pygame.sprite.Sprite):
         if not self.active:
             return
         elif (datetime.now() - self.timer).seconds > 0.15 and not ''.join(self.text[self.current_text].split('/')):
-            self.text[self.current_text] = self.text[self.current_text] + '/'\
-                if self.visible else self.text[self.current_text][:-1]
+            self.text[self.current_text] = self.text[self.current_text] + '/' if self.visible else self.text[self.current_text][:-1]
             self.timer = datetime.now()
             self.visible = not self.visible
         elif (not self.rect.colliderect(pygame.Rect(mouse_click[0], mouse_click[1], 1, 1))
@@ -216,8 +222,7 @@ class InteractLabel(pygame.sprite.Sprite):
         if command:
             self.text[self.current_text] = ''.join(self.text[self.current_text].split('/'))
             if (command.key == pygame.K_v) and (command.mod & pygame.KMOD_CTRL):
-                self.text[self.current_text] = (self.text[self.current_text] +
-                                                ("".join(str(pygame.scrap.get(pygame.SCRAP_TEXT))[2:].split(r"\x00"))))
+                self.text[self.current_text] += ("".join(str(pygame.scrap.get(pygame.SCRAP_TEXT))[2:].split(r"\x00")))
             elif command.key == pygame.K_BACKSPACE:
                 if self.text[self.current_text]:
                     self.text[self.current_text] = self.text[self.current_text][:-1]
@@ -228,10 +233,10 @@ class InteractLabel(pygame.sprite.Sprite):
                 if self.func:
                     self.func(*self.args)
             elif len(str(command.unicode)) > 0 and command.type == pygame.KEYDOWN:
-                self.text[self.current_text] = self.text[self.current_text] + command.unicode
+                self.text[self.current_text] += command.unicode
                 if self.font.size(self.text[self.current_text])[0] > self.rect.width * 0.9:
                     self.current_text += 1
-                    self.text.append('')
+                    self.text.append("")
 
 
 class Surface:
@@ -254,87 +259,32 @@ class Surface:
 
 
 class Label(pygame.sprite.Sprite):
-    def __init__(self, text, xoy, pp, board_size, lines=1, color=DEFAULT_COLOR, centric=True):
+    def __init__(self, text, xoy, size, color=DEFAULT_COLOR, centric=True):
         pygame.sprite.Sprite.__init__(self)
+        text = str(text)
         self.color = color
-        self.size = pp
-        self.board_size = board_size
-        self.lines = lines
-        self.scrollbar_width = 10
-        self.font = pygame.font.Font("19363.ttf", pp)
-        self.count = 0
-
-        self.label = self.wrap_text(text)
-        self.rect = self.font.render(self.label[0], True, self.color).get_rect(center=xoy)
-        self.rect.height = self.size * self.lines * 1.5
+        self.text = text
+        self.size = size
+        self.font = pygame.font.Font("19363.ttf", size)
+        self.label = list()
+        for text in self.text.split('\n'):
+            self.label.append(self.font.render(text, 1, color))
+        self.rect = self.label[0].get_rect(center=xoy)
         if not centric:
-            self.rect.topleft = xoy
+            self.rect.x, self.rect.y = xoy
 
-        self.scroll_offset = 0
-        self.scrollbar_rect = pygame.Rect(self.rect.width - self.scrollbar_width + 30, 0,
-                                          self.scrollbar_width, self.rect.height)
-        self.scrollbar_handle_height = 50
-        self.scrollbar_dragging = False
-        self.surface = None
-        self.create_surface()
-
-    def create_surface(self):
-        self.surface = pygame.Surface((self.rect.width + 30, self.rect.height))
-        self.surface.fill(BACKGROUND_COLOR)
-        pygame.draw.rect(self.surface, BACKGROUND_COLOR, self.rect)
-
-    def wrap_text(self, text):
-        lines = []
-        test_line = ''
-        print(text)
-        i = 0
-        for j in range(len(text)):
-            test_line += text[j]
-            if self.font.size(test_line)[0] > (self.board_size - self.scrollbar_width - 10):
-                lines.append(test_line)
-                print(test_line)
-                test_line = ''
-                i += 1
-        if test_line:
-            lines.append(test_line)
-
-        return lines
+    def new_text(self, text):
+        text = str(text)
+        self.label.clear()
+        for text in text.split('\n'):
+            self.label.append(self.font.render(text, 1, self.color))
 
     def draw(self, screen):
-        self.surface.fill(BACKGROUND_COLOR)
+        for i in range(len(self.label)):
+            screen.blit(self.label[i], (self.rect.x, self.rect.y + self.size * 1.5 * i))
 
-        y_offset = -self.scroll_offset
-        for idx, line in enumerate(self.label):
-            self.surface.blit(self.font.render(line, True, self.color), (0, y_offset))
-            y_offset += self.size * 1.5
-
-        total_text_height = len(self.label) * self.size * 1.5
-        if total_text_height > self.rect.height:
-            scrollbar_handle_y = (self.scroll_offset / total_text_height) * self.rect.height
-            scrollbar_handle_height = (self.rect.height / total_text_height) * self.rect.height
-            pygame.draw.rect(self.surface, (200, 200, 200), self.scrollbar_rect)
-            pygame.draw.rect(self.surface, (100, 100, 100),
-                             (self.scrollbar_rect.x, scrollbar_handle_y,
-                              self.scrollbar_width, scrollbar_handle_height))
-
-        screen.blit(self.surface, (self.rect.x, self.rect.y))
-
-    def update(self, mouse_click, command=None):
-        if mouse_click:
-            mouse_pos = pygame.mouse.get_pos()
-            if self.scrollbar_rect.collidepoint(mouse_pos[0] - self.rect.x, mouse_pos[1] - self.rect.y):
-                if mouse_click[0]:
-                    self.scrollbar_dragging = True
-
-        if not pygame.mouse.get_pressed()[0]:
-            self.scrollbar_dragging = False
-
-        if self.scrollbar_dragging:
-            mouse_pos = pygame.mouse.get_pos()
-            total_text_height = len(self.label) * self.size * 1.5
-            scrollbar_handle_y = mouse_pos[1] - self.rect.y
-            self.scroll_offset = (scrollbar_handle_y / self.rect.height) * total_text_height
-            self.scroll_offset = max(0, min(self.scroll_offset, total_text_height - self.rect.height))
+    def update(self, mouse_click, command):
+        pass
 
 
 class Image(pygame.sprite.Sprite):
