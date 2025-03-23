@@ -34,19 +34,19 @@ class Button(pygame.sprite.Sprite):
     def update(self, mouse_click, command=None):
         if not self.active:
             return
-        if self.rect.colliderect(mouse_click[0], mouse_click[1], 1, 1):
+        if self.rect.collidepoint(mouse_click[0], mouse_click[1]):
             self.image = self.trigger
             self.main_color = self.colors[0]
-            if mouse_click[2] and mouse_click[3] == 1 and self.func:
-                if self.one_press:
-                    self.one_press = False
-                    # pygame.mixer.Channel(1).play(sounds.click)
+            if mouse_click[2]:
+                if self.one_press and mouse_click[3] == 1 and self.func:
                     self.func(*self.args)
+                    self.one_press = False
             else:
                 self.one_press = True
         else:
             self.image = self.state
             self.main_color = self.colors[1]
+            self.one_press = True
 
 
 class Switch(pygame.sprite.Sprite):
@@ -306,8 +306,8 @@ class DropDown(pygame.sprite.Sprite):
         self.center = images[3].get_rect(center=xoy)
         self.center.x += images[3].get_rect()[2] / 2
         self.is_open = False
-        self.selected_text = InteractLabel([images[0], images[0]], (self.center.x - images[1].get_rect()[2] / 2, self.center.y), False)
-        self.selected_text.text = texts[0]
+        size = int(images[0].get_rect()[3] - images[0].get_rect()[3] / 3)
+        self.selected_text = InteractLabel([images[0], images[0]], (self.center.x - images[1].get_rect()[2] / 2, self.center.y), False, text=[texts[0]], size=size)
         self.arrow_button = Button(images[1:3], (self.center.x + images[0].get_rect()[2] / 2, self.center.y))
         self.variants = list()
         for i, text in enumerate(texts):
@@ -316,7 +316,7 @@ class DropDown(pygame.sprite.Sprite):
         self.arrow_button.connect(self.open_close)
 
     def select_variant(self, text):
-        self.selected_text.text = text
+        self.selected_text.text = self.selected_text.wrap_text([text])
 
     def open_close(self):
         self.is_open = not self.is_open

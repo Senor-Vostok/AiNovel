@@ -28,7 +28,7 @@ class Textures:
                        self.render("Assets/UI/Menu/slicerbutton.png", (8 * 6, 8 * 6))]
         self.dialogLabel = self.render("Assets/UI/Dialog/DialogLabel.png", (205 * 6, 75 * 6))
         self.BackSettings = self.render("Assets/UI/Menu/Back.png", (156 * 6, 99 * 6))
-        self.logo = self.render("Assets/UI/Menu/logo.png", (153 * 3, 52 * 3))
+        self.logo = self.render("Assets/UI/Menu/logo.png", (153 * 6, 52 * 6))
 
     def init_textures(self):
         self.characters = {name[:-4]: [self.render(f"Assets/Characters/{name}", (512, 512))] for name in

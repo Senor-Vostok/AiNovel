@@ -9,7 +9,7 @@ from Engine.Texture.Textures import Textures
 from Engine.Sound.Sounds import Sounds
 from Engine.Logic.Machine import Scene
 from Engine.Objects.MainCamera import MainCamera
-from Engine.Visual.Efffect import Effect, Information
+from Engine.Logic.AI import OpenAIWrapper
 from win32api import GetSystemMetrics
 from Engine.Constants import *
 from Engine.Visual.Render import Render
@@ -29,7 +29,8 @@ class EventHandler:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(self.size, pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.RESIZABLE)
         self.textures = Textures()
-        self.screen.blit(self.textures.loading, (self.center[0] - self.textures.loading.get_rect()[2] // 2, self.center[1] - self.textures.loading.get_rect()[3] // 2))
+        self.screen.blit(self.textures.loading, (self.center[0] - self.textures.loading.get_rect()[2] // 2,
+                                                 self.center[1] - self.textures.loading.get_rect()[3] // 2))
         pygame.display.flip()
         self.textures.init_textures()
         self.sounds = Sounds()
@@ -44,15 +45,38 @@ class EventHandler:
         self.render = Render(self)
         self.saves_story = []
         showMainMenu(self, self.center)
+        self.ai = OpenAIWrapper("sk-RB5FOndF7spe9gSsHTnzrskD1pJfrDxs")
+        if self.ai.tryCreateClient():
+            print("SUCCES")
+        self.story = dict()
+        self.dialog = 0
+
+    def step(self, step=1):
+        if self.dialog + step == len(self.story['dialogues']) or self.dialog + step == -1:
+            return
+        self.dialog += step
+        self.interfaces["dialog"].updateDialog({
+            "Characters_names": [_ for _ in self.story['characters_name'] if
+                                 _ != self.story['dialogues'][self.dialog][0]],
+            "Location": self.story['location'],
+            "Main_character": self.story['dialogues'][self.dialog][0],
+            "Dialog": self.story['dialogues'][self.dialog][1]})
 
     def change_volume(self, slicer, channel=0):
         self.volumes_channels[channel] = slicer.now_sector / slicer.cuts  # Проценты
         pygame.mixer.Channel(channel).set_volume(self.volumes_channels[channel])
 
     def createNewStory(self):
+        showNewStoryCreation(self, self.center)
+
+    def startStory(self, values):
+        self.story = self.get_story(values)
         pygame.mixer.Channel(0).play(random.choice(self.sounds.musics), -1)
         self.interfaces.clear()
-        showDialog(self, self.center)
+        try:
+            showDialog(self, self.center)
+        except Exception:
+            showMainMenu(self, self.center)
 
     def click_handler(self):
         command = None
@@ -62,10 +86,36 @@ class EventHandler:
                 command = i
                 if i.key == pygame.K_ESCAPE:
                     if len(self.interfaces) > 1:
-                        self.interfaces.pop([_ for _ in self.interfaces if self.interfaces[_] == self.last_interface][0])
+                        self.interfaces.pop(
+                            [_ for _ in self.interfaces if self.interfaces[_] == self.last_interface][0])
             if i.type == pygame.QUIT:
                 self.quit()
         return command
+
+    def get_story(self, values):
+        characters = self.textures.characters.keys()
+        locations = self.textures.locations.keys()
+        s = f"""Создай историю для визуальной новеллы на русском в соответствии с этим шаблоном, выбрав случайных персонажей, не давая им имен, и 
+                локацию (не меняй шаблон и подписывай говорящих в диалоге), свою историю составь только из диалогов персонажей, без 
+                описания чего-либо происходящего между ними. Во время диалога дай имена персонажам и держи их в уме, когда будешь 
+                составлять диалоги между ними. Диалоги сделай достаточно длинными и информативными, старайся редко использовать 
+                короткие эмоциональные предложения. Имена персонажей для диалога можешь выбрать из этого списка: 
+                {values["persons"] if len(values["persons"]) > 0 else 'на твое усмотрение'}. Не забывай, что в описании диалога, ты должен использовать 
+                кодовое имя персонажа в формате "chatacterX: dialog", без указания настоящего имени говорящего(НИГДЕ, КРОМЕ САМОГО ДИАЛОГА ИМЯ НЕ ДОЛЖНО УПОМЯНАТЬСЯ). И делай диалоги 
+                подлиннее. В ответе между строками НЕ СОТАВЛЯЙ ПУСТЫЕ МЕСТА, только текст без каких либо "украшений". В Characters_names только те персонажи которые действительно участвуют в диалогах
+                Жанр - {values["genre"]}, Предыстория или краткое начало, которые ты должен знать: {values["entry"]}:
+                Characters_names: {', '.join(characters)}
+                Location: {', '.join(locations)}
+                Main_character:
+                Dialog:"""
+        response = self.ai.request_to_ai(s).split("\n")
+        print(response)
+        story = dict()
+        story["characters_name"] = (''.join((response[0].split())[1:])).split(',')
+        story["location"] = response[1].split()[1]
+        story["dialogues"] = [[i.split(": ")[0], ": ".join(i.split(": ")[1:])] for i in response[5:]]
+        print(story)
+        return story
 
     def update(self):
         self.screen.fill(BACKGROUND_COLOR)
