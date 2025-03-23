@@ -1,28 +1,29 @@
 from Engine.Objects.UI import Widgets as W
-import pygame
 import random
 
 screen_width = None
 screen_height = None
 
 
-class Test:
+class ChoicePrefab:
     def __init__(self, language_data, xoy, textures):
-        self.hello = W.Label("Hello Team 1 :))", (xoy[0], xoy[1] + 100), 80, 100, (255, 255, 255))
+        img = textures.buttonBigButton[0]
+        self.character = W.Button(textures.buttonBigButtonChoice, (xoy[0] - (img.get_rect()[2] / 2) * 1.1, xoy[1]),
+                                  text="Character", colors=[(10, 52, 35), (83, 38, 8)])
+        self.location = W.Button(textures.buttonBigButtonChoice, (xoy[0] + (img.get_rect()[2] / 2) * 1.1, xoy[1]),
+                                 text="Location", colors=[(10, 52, 35), (83, 38, 8)])
+        self.surface = W.Surface(self.character, self.location)
 
-        self.image = W.Image(textures.characters["character19"][0], (xoy[0], xoy[1] - 200))
 
-        self.figure = W.Figure([xoy[0], xoy[1] - 100], (48, 35, 22, 255),
-                               form=[[100, 30], [30, 100], [100, 100], [30, 30], [100, 30]], thickness=2,
-                               color_bord=(252, 0, 0, 255))
-
-        self.circle = W.Circle([xoy[0], xoy[1] + 200], (48, 35, 22, 255), radius=100, thickness=2,
-                               color_bord=(252, 0, 0, 0))
-        self.dropdown = W.DropDown(
-            textures.DropDown["selected"] + textures.DropDown["arrow"] + textures.DropDown["variant"],
-            (xoy[0], xoy[1] + 200), ("1", "2", "3", "4", "5"))
-        self.background = W.Image(textures.locations["InsideTheCircusTent"][0], xoy)
-        self.surface = W.Surface(self.background, self.image, self.hello, self.figure, self.dropdown)
+class Settings:
+    def __init__(self, language_data, xoy, textures):
+        self.Back = W.Image(textures.BackSettings, xoy)
+        self.VolumeSettingInf = W.Label(text="Volume", xoy=(
+        xoy[0], xoy[1] - self.Back.image.get_rect()[3] / 2 + 50 * textures.resizer), size=20)
+        self.VolumeSetting = W.Slicer(images=textures.Slicer,
+                                      xoy=(xoy[0], xoy[1] - self.Back.image.get_rect()[3] / 2 + 90 * textures.resizer),
+                                      cuts=100, now_sector=20)
+        self.surface = W.Surface(self.Back, self.VolumeSettingInf, self.VolumeSetting)
 
 
 class Entry:
@@ -32,7 +33,7 @@ class Entry:
 
 
 class MainMenu:
-    def __init__(self, language_data, xoy, textures, saves_story, new_story):
+    def __init__(self, language_data, xoy, textures, saves_story, new_story, quit):
         self.textures = textures
         self.screen_width = xoy[0] * 2
         self.screen_height = xoy[1] * 2
@@ -44,22 +45,29 @@ class MainMenu:
 
         character = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
         character = self.textures.post_render(character, (character.get_rect()[2] * 1.8, character.get_rect()[3] * 1.8))
-        xoy_image = ((self.screen_width - character.get_rect()[2] / 2 - 10) * self.textures.resizer, (self.screen_height - character.get_rect()[3] / 2) * self.textures.resizer)
+        xoy_image = ((self.screen_width - character.get_rect()[2] / 2 - 10) * self.textures.resizer,
+                     (self.screen_height - character.get_rect()[3] / 2) * self.textures.resizer)
         self.surface.widgets.append(W.Image(character, xoy_image))
 
-        # back = self.textures.back
-        # self.surface.widgets.append(W.Image(back, xoy))
-
         img = self.textures.buttonBigButton[0]
-        xoy_image = ((img.get_rect()[2] / 2 + 200) * self.textures.resizer, (img.get_rect()[3] / 2 + 100) * self.textures.resizer)
-        self.NewStory = W.Button(self.textures.buttonBigButton, xoy_image, text="New Story", colors=[(10, 52, 35), (83, 38, 8)])
-        self.LastStory = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 1.2), text="Continue", colors=[(10, 52, 35), (83, 38, 8)])
-        self.LoadStory = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 2.4), text="Load", colors=[(10, 52, 35), (83, 38, 8)])
-        self.Settings = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 3.6), text="Settings", colors=[(10, 52, 35), (83, 38, 8)])
-        self.AI = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 4.8), text="Connect AI", colors=[(10, 52, 35), (83, 38, 8)])
-        self.Custom = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 6), text="My sprites", colors=[(10, 52, 35), (83, 38, 8)])
-        self.Quite = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 7.2), text="Quite", colors=[(10, 52, 35), (83, 38, 8)])
+        xoy_image = (
+        (img.get_rect()[2] / 2 + 50) * self.textures.resizer, (img.get_rect()[3] / 2 + 100) * self.textures.resizer)
+        self.NewStory = W.Button(self.textures.buttonBigButton, xoy_image, text="New Story",
+                                 colors=[(10, 52, 35), (83, 38, 8)])
+        self.LastStory = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 1.2),
+                                  text="Continue", colors=[(10, 52, 35), (83, 38, 8)])
+        self.LoadStory = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 2.4),
+                                  text="Load", colors=[(10, 52, 35), (83, 38, 8)])
+        self.Settings = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 3.6),
+                                 text="Settings", colors=[(10, 52, 35), (83, 38, 8)])
+        self.AI = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 4.8),
+                           text="Connect AI", colors=[(10, 52, 35), (83, 38, 8)])
+        self.Custom = W.Button(self.textures.buttonBigButton, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 6),
+                               text="My sprites", colors=[(10, 52, 35), (83, 38, 8)])
+        self.Quite = W.Button(self.textures.buttonExit, (xoy_image[0], xoy_image[1] + img.get_rect()[3] * 7.2),
+                              text="Quite", colors=[(0, 0, 0), (83, 38, 8)])
         self.NewStory.connect(new_story)
+        self.Quite.connect(quit)
         self.surface.widgets.append(self.NewStory)
         self.surface.widgets.append(self.LastStory)
         self.surface.widgets.append(self.LoadStory)
@@ -69,7 +77,8 @@ class MainMenu:
         self.surface.widgets.append(self.Quite)
 
         img = self.textures.logo
-        xoy_image = ((self.screen_width - img.get_rect()[2] / 2) * self.textures.resizer, (img.get_rect()[3] / 2) * self.textures.resizer)
+        xoy_image = ((self.screen_width - img.get_rect()[2] / 2) * self.textures.resizer,
+                     (img.get_rect()[3] / 2) * self.textures.resizer)
         self.NewStory = W.Image(self.textures.logo, xoy_image)
         self.surface.widgets.append(self.NewStory)
 
@@ -158,56 +167,63 @@ class NewStoryCreationScreen:
 
 
 class DialogueUI:
-    def __init__(self, language_data, xoy, textures, cue):
-        self.character_names = cue.get("Characters_names")
-        self.location = cue.get("Location")
-        self.main_character = cue.get("Main_character")
-        self.dialog = cue.get("Dialog")
+    class Character:
+        def __init__(self, name, position, dialogue=None, scale=1, texture=None):
+            self.dialogue = dialogue
+            self.name = name
+            self.scale = scale
+            if dialogue is not None:
+                self.textures = dialogue.textures
+            if texture is not None:
+                self.texture = texture
+            else:
+                self.texture = self.textures.characters[self.name][0]
+
+            self.scale_texture()
+            self.size = self.texture.get_rect()[3]
+
+            self.position = position
+
+        def set_position_for_left_bottom_corner(self, position):
+            size = self.texture.get_rect()[2]
+            self.position = (position[0] + (size // 2), position[1] - (size // 2))
+            return self
+
+        def set_position_for_right_bottom_corner(self, position):
+            size = self.texture.get_rect()[2]
+            print(size)
+            self.position = (position[0] - (size // 2), position[1] - (size // 2))
+            return self
+
+        def widget(self):
+            return W.Image(self.texture, self.position)
+
+        def scale_texture(self):
+            self.texture = self.textures.post_render(self.texture, (self.texture.get_rect()[2] * self.scale, self.texture.get_rect()[3] * self.scale))
+
+    def __init__(self, language_data, xoy, textures, dialogue_data, story_name=None):
+        self.elements = []
+        self.character_names = dialogue_data.get("Characters_names")
+        self.location = dialogue_data.get("Location")
+        self.main_character = dialogue_data.get("Main_character")
+        self.dialog = dialogue_data.get("Dialog")
         self.textures = textures
-
-        main_character_image = self.textures.characters[self.main_character][0]
-        print(self.main_character)
-
-        left_margin = xoy[0] * 2 * 0.05
-        right_margin = xoy[0] * 2 * 0.95
-        half_main_character_size = main_character_image.get_rect()[2] // 2
-        main_character_vertical_position = xoy[1] - half_main_character_size
-        half_other_characters_size = None
-
-        other_characters_images = dict()
-        for character_name in self.character_names:
-            other_char_image = self.textures.characters[character_name][0]
-            scale = 0.5
-            other_char_image = self.textures.post_render(other_char_image,
-                                                         (other_char_image.get_rect()[2] * scale,
-                                                          other_char_image.get_rect()[3] * scale))
-            other_characters_images[character_name] = other_char_image
-
-            if half_other_characters_size is None:
-                half_other_characters_size = other_char_image.get_rect()[3] // 2
-
         self.background = W.Image(textures.locations[self.location][0], xoy)
-
-        self.text_box = W.Figure([xoy[0], xoy[1] + xoy[1] // 2], (255, 255, 255, 255),
-                                 form=[[xoy[0], xoy[1] // 4], [xoy[0], -xoy[1] // 4], [-xoy[0], -xoy[1] // 4],
-                                       [-xoy[0], xoy[1] // 4]])
-
-        self.text = W.Label(self.dialog, (left_margin, xoy[1]), 50, xoy[0] * 2 * 0.9, lines=7, centric=False)
-
-        self.main_character_image_widget = W.Image(main_character_image, (
-        left_margin + half_main_character_size, main_character_vertical_position))
-
-        self.elements = [self.background, self.text_box, self.text, self.main_character_image_widget]
-
-        other_character_horizontal_position = right_margin - half_other_characters_size
-        other_character_vertical_position = xoy[1] - half_other_characters_size
-
-        print(right_margin)
-        for char_image in other_characters_images.values():
-            self.elements.append(
-                W.Image(char_image, (other_character_horizontal_position, other_character_vertical_position)))
-            other_character_horizontal_position -= half_other_characters_size * 2
-
-        self.surface = W.Surface(*self.elements)
-
-# how to get image: image = self.textures.characters[random.choice(list(self.textures.characters.keys()))][0]
+        self.elements.append(self.background)
+        self.elements.append(
+            DialogueUI.Character(self.main_character, xoy, self, scale=1.3)
+            .set_position_for_left_bottom_corner((0, xoy[1] * 2))
+            .widget()
+        )
+        img = textures.dialogLabel.get_rect()
+        self.elements.append(W.InteractLabel(text=[self.dialog], xoy=(xoy[0] * 2 - img[2] // 2 - 20 * textures.resizer, xoy[1] * 2 - img[3] // 2 - 20 * textures.resizer), images=[textures.dialogLabel, textures.dialogLabel], active=False, size=30))
+        character_position = (xoy[0] * 2 - xoy[0] * 2 * 0.01, xoy[1] * 2 - img[3] // 2 - 20 * textures.resizer - img[3] // 2)
+        for character in self.character_names:
+            character_obj = DialogueUI.Character(name=character, position=character_position, dialogue=self, scale=0.25).set_position_for_right_bottom_corner(character_position)
+            self.elements.append(character_obj.widget())
+            character_position = character_position[0] - character_obj.size, character_position[1]
+        img = textures.buttonStep[0].get_rect()
+        self.ButtonNextStep = W.Button(textures.buttonStep, (xoy[0] * 2 - 10 * textures.resizer - img[2] / 2, 10 * textures.resizer + img[3] / 2))
+        self.ButtonBackStep = W.Button(textures.buttonStep, (10 * textures.resizer + img[2] / 2, 10 * textures.resizer + img[3] / 2))
+        self.ReturnToMenu = W.Button(textures.EBack, (10 * textures.resizer + img[2] / 2, 10 * textures.resizer + img[3] * 1.6))
+        self.surface = W.Surface(*self.elements, self.ButtonNextStep, self.ButtonBackStep, self.ReturnToMenu)

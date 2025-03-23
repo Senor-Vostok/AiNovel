@@ -14,8 +14,20 @@ class Textures:
         self.font = pygame.font.Font('19363.ttf', int(20 * self.resizer))
         self.loading = self.render("Assets/Loading/logo.png", (1280, 720))
         self.back = self.render("Assets/UI/Menu/something.png", (1920, 1080))
+        self.buttonBigButtonChoice = [self.render("Assets/UI/Menu/ButtonChoiceGame.png", (356 * 1.5, 68 * 1.5)),
+                                      self.render("Assets/UI/Menu/ButtonChoiceGameT.png", (356 * 1.5, 68 * 1.5))]
         self.buttonBigButton = [self.render("Assets/UI/Menu/ButtonNewGame.png", (356 * 1.5, 68 * 1.5)),
                                 self.render("Assets/UI/Menu/ButtonNewGameT.png", (356 * 1.5, 68 * 1.5))]
+        self.buttonExit = [self.render("Assets/UI/Menu/ButtonExit.png", (356 * 1.5, 68 * 1.5)),
+                                self.render("Assets/UI/Menu/ButtonExitT.png", (356 * 1.5, 68 * 1.5))]
+        self.buttonStep = [self.render("Assets/UI/Dialog/back.png", (17 * 6, 9 * 6)),
+                           self.render("Assets/UI/Dialog/backT.png", (17 * 6, 9 * 6))]
+        self.EBack = [self.render("Assets/UI/Dialog/eback.png", (17 * 6, 9 * 6)),
+                      self.render("Assets/UI/Dialog/ebackT.png", (17 * 6, 9 * 6))]
+        self.Slicer = [self.render("Assets/UI/Menu/slicerback.png", (134 * 6, 2 * 6)),
+                       self.render("Assets/UI/Menu/slicerbutton.png", (8 * 6, 8 * 6))]
+        self.dialogLabel = self.render("Assets/UI/Dialog/DialogLabel.png", (205 * 6, 75 * 6))
+        self.BackSettings = self.render("Assets/UI/Menu/Back.png", (156 * 6, 99 * 6))
         self.logo = self.render("Assets/UI/Menu/logo.png", (153 * 3, 52 * 3))
 
     def init_textures(self):
