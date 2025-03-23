@@ -1,12 +1,8 @@
-import math
-
 import pygame
 from datetime import datetime
 import Engine.Constants
 from Engine.Constants import DEFAULT_COLOR, BACKGROUND_COLOR
 from Engine.Sound.Sounds import Sounds
-import textwrap
-from win32api import GetSystemMetrics
 
 sounds = Sounds()
 
@@ -147,14 +143,14 @@ class InteractLabel(pygame.sprite.Sprite):
 
     def create_surface(self):
         self.surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
-        self.surface.fill((233, 217, 202, 0))
+        self.surface.fill((0, 0, 0, 0))
         self.fill_surface()
 
     def fill_surface(self):
-        pygame.draw.rect(self.surface, (233, 217, 202, 0), self.rect)
+        pygame.draw.rect(self.surface, (0, 0, 0, 0), self.rect)
 
     def draw(self, screen):
-        self.surface.fill((233, 217, 202, 0))
+        self.surface.fill((0, 0, 0, 0))
         y_offset = -self.scroll_offset
         for idx, line in enumerate(self.text):
             text_surface = self.font.render(line, False, (0, 0, 0))
@@ -340,6 +336,7 @@ class Label(pygame.sprite.Sprite):
             self.scroll_offset = (scrollbar_handle_y / self.rect.height) * total_text_height
             self.scroll_offset = max(0, min(self.scroll_offset, total_text_height - self.rect.height))
 
+
 class Image(pygame.sprite.Sprite):
     def __init__(self, image, xoy):
         pygame.sprite.Sprite.__init__(self)
@@ -451,6 +448,7 @@ class Circle(pygame.sprite.Sprite):
 
     def update(self, mouse_click, command):
         pass
+
 
 class Entry:
     def __init__(self, text: str, function=None):
