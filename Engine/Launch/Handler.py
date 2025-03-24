@@ -45,7 +45,7 @@ class EventHandler:
         self.render = Render(self)
         self.saves_story = []
         showMainMenu(self, self.center)
-        self.ai = OpenAIWrapper("sk-RB5FOndF7spe9gSsHTnzrskD1pJfrDxs")
+        self.ai = OpenAIWrapper("")
         if self.ai.tryCreateClient():
             print("SUCCES")
         self.story = dict()
