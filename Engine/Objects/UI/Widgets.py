@@ -74,8 +74,8 @@ class Switch(pygame.sprite.Sprite):
         if self.rect.colliderect(mouse_click[0], mouse_click[1], 1, 1) and mouse_click[2] and mouse_click[3] == 1:
             if self.one_press:
                 return
-            # pygame.mixer.Channel(1).play(sounds.click)
             self.one_press = True
+            self.func(*self.args)
             self.active = not self.active
             self.image = self.enable if self.active else self.disable
         else:
@@ -141,6 +141,10 @@ class InteractLabel(pygame.sprite.Sprite):
         self.text = self.wrap_text(text)
         self.current_text = len(self.text) - 1
         self.create_surface()
+
+    def insertText(self, text):
+        self.text = self.wrap_text([text])
+        self.current_text = len(self.text) - 1
 
     def wrap_text(self, text_lines):
         try:

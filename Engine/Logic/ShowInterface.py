@@ -39,6 +39,15 @@ def showNewStoryCreation(handler, centre):
 
 def showSettings(handler, centre):
     if len(handler.interfaces) > 1: handler.interfaces.pop([_ for _ in handler.interfaces if handler.interfaces[_] == handler.last_interface][0])
-    handler.interfaces['settings'] = Interfaces.Settings(None, centre, handler.textures)
+    handler.interfaces['settings'] = Interfaces.Settings(None, centre, handler.textures, handler.ai.api_key)
     handler.interfaces['settings'].VolumeSetting.connect(lambda: handler.change_volume(handler.interfaces['settings'].VolumeSetting))
+    handler.interfaces['settings'].ApiField.connect(lambda: handler.changeApiKey(''.join(handler.interfaces['settings'].ApiField.text)))
+    handler.interfaces['settings'].Eye.connect(lambda: hideInfo(handler))
+
+
+def hideInfo(handler):
+    if handler.interfaces['settings'].Eye.active:
+        handler.interfaces['settings'].ApiField.insertText("*" * len(handler.ai.api_key))
+    else:
+        handler.interfaces['settings'].ApiField.insertText(handler.ai.api_key)
 

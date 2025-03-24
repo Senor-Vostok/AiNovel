@@ -26,6 +26,10 @@ class Textures:
                       self.render("Assets/UI/Dialog/ebackT.png", (17 * 6, 9 * 6))]
         self.Slicer = [self.render("Assets/UI/Menu/slicerback.png", (134 * 6, 2 * 6)),
                        self.render("Assets/UI/Menu/slicerbutton.png", (8 * 6, 8 * 6))]
+        self.Eye = [self.render("Assets/UI/Menu/buttoneye.png", (12 * 6, 11 * 6)),
+                    self.render("Assets/UI/Menu/buttoneyeT.png", (12 * 6, 11 * 6))]
+        self.Field = [self.render("Assets/UI/Menu/input.png", (121 * 6, 11 * 6)),
+                      self.render("Assets/UI/Menu/inputT.png", (121 * 6, 11 * 6))]
         self.dialogLabel = self.render("Assets/UI/Dialog/DialogLabel.png", (205 * 6, 75 * 6))
         self.BackSettings = self.render("Assets/UI/Menu/Back.png", (156 * 6, 99 * 6))
         self.logo = self.render("Assets/UI/Menu/logo.png", (153 * 6, 52 * 6))

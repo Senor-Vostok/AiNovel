@@ -70,13 +70,16 @@ class EventHandler:
         showNewStoryCreation(self, self.center)
 
     def startStory(self, values):
-        self.story = self.get_story(values)
-        pygame.mixer.Channel(0).play(random.choice(self.sounds.musics), -1)
-        self.interfaces.clear()
         try:
+            self.story = self.get_story(values)
+            pygame.mixer.Channel(0).play(random.choice(self.sounds.musics), -1)
+            self.interfaces.clear()
             showDialog(self, self.center)
         except Exception:
             showMainMenu(self, self.center)
+
+    def changeApiKey(self, api_key):
+        self.ai.updateAPIKEY(api_key)
 
     def click_handler(self):
         command = None

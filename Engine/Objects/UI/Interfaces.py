@@ -16,14 +16,18 @@ class ChoicePrefab:
 
 
 class Settings:
-    def __init__(self, language_data, xoy, textures):
+    def __init__(self, language_data, xoy, textures, api):
         self.Back = W.Image(textures.BackSettings, xoy)
         self.VolumeSettingInf = W.Label(text="Звук", xoy=(
             xoy[0], xoy[1] - self.Back.image.get_rect()[3] / 2 + 50 * textures.resizer), size=20)
         self.VolumeSetting = W.Slicer(images=textures.Slicer,
                                       xoy=(xoy[0], xoy[1] - self.Back.image.get_rect()[3] / 2 + 90 * textures.resizer),
                                       cuts=100, now_sector=20)
-        self.surface = W.Surface(self.Back, self.VolumeSettingInf, self.VolumeSetting)
+        self.ApiInf = W.Label(text="Ваш апи ключ от gpt", xoy=(xoy[0], xoy[1] - self.Back.image.get_rect()[3] / 2 + 170 * textures.resizer), size=20)
+        cen = (xoy[0], xoy[1] - self.Back.image.get_rect()[3] / 2 + 220 * textures.resizer)
+        self.ApiField = W.InteractLabel(textures.Field, xoy=(cen[0] - textures.Eye[0].get_rect()[2] / 2, cen[1]), size=textures.Field[0].get_rect()[3] - textures.Field[0].get_rect()[3] // 4, center=True, text=[api])
+        self.Eye = W.Switch(textures.Eye, (cen[0] + textures.Field[0].get_rect()[2] / 2, cen[1]))
+        self.surface = W.Surface(self.Back, self.VolumeSettingInf, self.VolumeSetting, self.ApiInf, self.ApiField, self.Eye)
 
 
 class Entry:
