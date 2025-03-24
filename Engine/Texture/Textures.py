@@ -22,6 +22,8 @@ class Textures:
                                 self.render("Assets/UI/Menu/ButtonExitT.png", (356 * 1.5, 68 * 1.5))]
         self.buttonStep = [self.render("Assets/UI/Dialog/back.png", (17 * 6, 9 * 6)),
                            self.render("Assets/UI/Dialog/backT.png", (17 * 6, 9 * 6))]
+        self.buttonStepNext = [self.render("Assets/UI/Dialog/next.png", (17 * 6, 9 * 6)),
+                               self.render("Assets/UI/Dialog/nextT.png", (17 * 6, 9 * 6))]
         self.EBack = [self.render("Assets/UI/Dialog/eback.png", (17 * 6, 9 * 6)),
                       self.render("Assets/UI/Dialog/ebackT.png", (17 * 6, 9 * 6))]
         self.Slicer = [self.render("Assets/UI/Menu/slicerback.png", (134 * 6, 2 * 6)),

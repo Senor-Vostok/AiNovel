@@ -115,7 +115,7 @@ class NewStoryCreationScreen:
                                                  active=True,
                                                  size=50)
         img = textures.buttonStep[0].get_rect()
-        self.proceedButton = W.Button(textures.buttonStep, (xoy[0] * 2 - 10 * textures.resizer - img[2] / 2,
+        self.proceedButton = W.Button(textures.buttonStepNext, (xoy[0] * 2 - 10 * textures.resizer - img[2] / 2,
                                                             xoy[1] * 2 - 10 * textures.resizer - img[3] / 2))
         self.ReturnToMenuButton = W.Button(textures.EBack,
                                            (10 * textures.resizer + img[2] / 2, 5 * textures.resizer + img[3]))
@@ -189,7 +189,7 @@ class DialogueUI:
             self.elements.append(character_obj.widget())
             character_position = character_position[0] - character_obj.size, character_position[1]
         img = textures.buttonStep[0].get_rect()
-        self.ButtonNextStep = W.Button(textures.buttonStep, (
+        self.ButtonNextStep = W.Button(textures.buttonStepNext, (
             xoy[0] * 2 - 10 * textures.resizer - img[2] / 2, 10 * textures.resizer + img[3] / 2))
         self.ButtonBackStep = W.Button(textures.buttonStep,
                                        (10 * textures.resizer + img[2] / 2, 10 * textures.resizer + img[3] / 2))
@@ -202,6 +202,7 @@ class DialogueUI:
         self.location = dialogue_data.get("Location")
         self.main_character = dialogue_data.get("Main_character")
         self.dialog = dialogue_data.get("Dialog")
+        self.surface.widgets[0].image = self.textures.locations[self.location][0]
         self.surface.widgets[2].text = self.surface.widgets[2].wrap_text([self.dialog])
         self.surface.widgets[1].image = self.textures.post_render(self.textures.characters[self.main_character][0], (
             self.elements[1].image.get_rect()[2], self.elements[1].image.get_rect()[3]))

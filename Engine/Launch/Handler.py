@@ -49,11 +49,16 @@ class EventHandler:
         if self.ai.tryCreateClient():
             print("SUCCES")
         self.story = dict()
+        self.now_story = str
         self.dialog = 0
 
     def step(self, step=1):
-        if self.dialog + step == len(self.story['dialogues']) or self.dialog + step == -1:
+        if self.dialog + step == -1:
             return
+        elif self.dialog + step == len(self.story['dialogues']):
+            self.story, self.now_story = self.continue_story(self.values)
+            print(self.story, self.now_story)
+            self.dialog = -1
         self.dialog += step
         self.interfaces["dialog"].updateDialog({
             "Characters_names": [_ for _ in self.story['characters_name'] if
@@ -71,12 +76,12 @@ class EventHandler:
 
     def startStory(self, values):
         try:
-            self.story = self.get_story(values)
+            self.story, self.now_story = self.get_story(values)
             pygame.mixer.Channel(0).play(random.choice(self.sounds.musics), -1)
             self.interfaces.clear()
             showDialog(self, self.center)
         except Exception:
-            showMainMenu(self, self.center)
+            pass
 
     def changeApiKey(self, api_key):
         self.ai.updateAPIKEY(api_key)
@@ -95,7 +100,34 @@ class EventHandler:
                 self.quit()
         return command
 
+    def continue_story(self, values):
+        locations = self.textures.locations.keys()
+        s = f"""История для визуальной новеллы на русском не меняй шаблон и подписывай говорящих в диалоге, свою историю составь только из диалогов персонажей, без 
+                        описания чего-либо происходящего между ними. Диалоги сделай достаточно длинными и информативными, старайся редко использовать 
+                        короткие эмоциональные предложения. Не забывай, что в описании диалога, ты должен использовать 
+                        кодовое имя персонажа в формате "chatacterX: dialog", без указания настоящего имени говорящего(НИГДЕ, КРОМЕ САМОГО ДИАЛОГА ИМЯ НЕ ДОЛЖНО УПОМЯНАТЬСЯ). И делай диалоги 
+                        подлиннее. В ответе между строками НЕ СОТАВЛЯЙ ПУСТЫЕ МЕСТА, только текст без каких либо "украшений". В Characters_names только те персонажи которые действительно участвуют в диалогах И ТОЛЬКО ИХ КОДОВЫЕ ИМЕНА:
+                        Твой ответ должен соответствовать данным паттернам r"\*\*Characters_names:\s*.*\n*\*\*Location:\s*.*\n*\*\*Main_character:\s*.*\n*\*\*Dialog:\s*.*\n*" и r"Characters_names:\s*.*\n*Location:\s*.*\n*Main_character:\s*.*\n*Dialog:\s*.*\n"
+                        Жанр - {values["genre"]}
+                        Characters_names: {', '.join(self.story['characters_name'])}
+                        Location: {', '.join(locations)}
+                        Main_character:
+                        Dialog:"""
+        s = f"""запомни, твой ответ должен быть ТОЧНО ТАКОЙ же: ```{self.now_story}``` тебе нужно лишь написать новые диалоги, как продолжение истории, если хочешь, можешь поменять Location из списка {', '.join(locations)}. Следуй памятке {s}"""
+        original = self.ai.request_to_ai(s)
+        response = [i for i in original.split("\n") if i]
+        print(response)
+        story = dict()
+        if not (''.join((response[0].split())[1:])).split(','):
+            response = response[1:-1]
+        story["characters_name"] = (''.join((response[0].split())[1:])).split(',')
+        story["location"] = response[1].split()[1]
+        story["dialogues"] = [[i.split(": ")[0], ": ".join(i.split(": ")[1:])] for i in response[4:] if i]
+        print(story)
+        return story, original
+
     def get_story(self, values):
+        self.values = values
         characters = self.textures.characters.keys()
         locations = self.textures.locations.keys()
         s = f"""Создай историю для визуальной новеллы на русском в соответствии с этим шаблоном, выбрав случайных персонажей, не давая им имен, и 
@@ -105,20 +137,23 @@ class EventHandler:
                 короткие эмоциональные предложения. Имена персонажей для диалога можешь выбрать из этого списка: 
                 {values["persons"] if len(values["persons"]) > 0 else 'на твое усмотрение'}. Не забывай, что в описании диалога, ты должен использовать 
                 кодовое имя персонажа в формате "chatacterX: dialog", без указания настоящего имени говорящего(НИГДЕ, КРОМЕ САМОГО ДИАЛОГА ИМЯ НЕ ДОЛЖНО УПОМЯНАТЬСЯ). И делай диалоги 
-                подлиннее. В ответе между строками НЕ СОТАВЛЯЙ ПУСТЫЕ МЕСТА, только текст без каких либо "украшений". В Characters_names только те персонажи которые действительно участвуют в диалогах
+                подлиннее. В ответе между строками НЕ СОТАВЛЯЙ ПУСТЫЕ МЕСТА, только текст без каких либо "украшений"(```). В Characters_names только те персонажи которые действительно участвуют в диалогах И ТОЛЬКО ИХ КОДОВЫЕ ИМЕНА
                 Жанр - {values["genre"]}, Предыстория или краткое начало, которые ты должен знать: {values["entry"]}:
                 Characters_names: {', '.join(characters)}
                 Location: {', '.join(locations)}
                 Main_character:
                 Dialog:"""
-        response = self.ai.request_to_ai(s).split("\n")
+        original = self.ai.request_to_ai(s)
+        response = [i for i in original.split("\n") if i]
         print(response)
         story = dict()
+        if not (''.join((response[0].split())[1:])).split(','):
+            response = response[1:-1]
         story["characters_name"] = (''.join((response[0].split())[1:])).split(',')
         story["location"] = response[1].split()[1]
-        story["dialogues"] = [[i.split(": ")[0], ": ".join(i.split(": ")[1:])] for i in response[5:]]
+        story["dialogues"] = [[i.split(": ")[0], ": ".join(i.split(": ")[1:])] for i in response[4:] if i]
         print(story)
-        return story
+        return story, original
 
     def update(self):
         self.screen.fill(BACKGROUND_COLOR)
